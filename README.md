@@ -60,7 +60,7 @@ Flujo tipico del sistema:
    - se genera logistica automaticamente en `PENDIENTE`
 7. Desde logistica se puede despachar manualmente (`DESPACHADA`) y continuar el flujo de estados.
 
-### 3) Gestion de plataforma (owner)
+### 3) Gestion de plataforma 
 
 Seccion orientada al duenio de la plataforma (**CodeNova**):
 
@@ -134,7 +134,7 @@ operativa, control financiero y modelo de negocio de plataformas e-commerce.
 - **Facturacion de plataforma**: aplica una logica de monetizacion SaaS + revenue share,
   separando cuota fija y comision variable sobre base comisionable.
 
-### Bibliografia de referencia (castellano)
+### Bibliografia de referencia 
 
 1. Laudon, K. C., & Traver, C. G. _Comercio electronico: Negocios, tecnologia, sociedad_. Pearson.
 2. Romney, M. B., & Steinbart, P. J. _Sistemas de informacion contable_. Pearson.
