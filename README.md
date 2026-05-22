@@ -120,6 +120,32 @@ Calcula lo que la plataforma factura por comercio:
 - total a facturar
 - totales globales (cuotas, comisiones, total)
 
+## Fundamento teorico de metricas y reportes
+
+Las metricas implementadas en esta aplicacion no son arbitrarias; responden a criterios de gestion
+operativa, control financiero y modelo de negocio de plataformas e-commerce.
+
+- **Conciliacion**: se basa en principios de control interno y reconciliacion de registros.
+  Permite verificar consistencia entre transacciones y pagos para detectar desvíos de estado,
+  montos y referencias.
+- **Hot Sale (KPI operativos)**: usa indicadores tipicos de comercio digital
+  (GMV, tasa de aprobacion, tasa de rechazo, ticket promedio, pendientes) para monitorear
+  rendimiento comercial y detectar alertas tempranas.
+- **Facturacion de plataforma**: aplica una logica de monetizacion SaaS + revenue share,
+  separando cuota fija y comision variable sobre base comisionable.
+
+### Bibliografia de referencia (castellano)
+
+1. Laudon, K. C., & Traver, C. G. _Comercio electronico: Negocios, tecnologia, sociedad_. Pearson.
+2. Romney, M. B., & Steinbart, P. J. _Sistemas de informacion contable_. Pearson.
+3. Kotler, P., & Keller, K. L. _Direccion de marketing_. Pearson.
+4. Pressman, R. S., & Maxim, B. R. _Ingenieria de software: Un enfoque practico_. McGraw-Hill.
+
+### Fuentes tecnicas oficiales
+
+- MongoDB Documentation: modelado documental, consultas e indices.
+- Mongoose Documentation: schemas, validaciones, restricciones y flujo con MongoDB.
+
 ## Vistas y experiencia de uso
 
 La app usa Pug para administracion visual:
