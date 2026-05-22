@@ -1,0 +1,36 @@
+extends ../layout
+
+block content
+  h1 Transacciones
+  a(href="/transacciones/new") Nueva transaccion
+  if !items.length
+    p No hay transacciones cargadas.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Tienda
+          th Usuario
+          th Monto
+          th Estado
+          th Pago
+          th Logistica
+          th Acciones
+      tbody
+        each item in items
+          tr
+            td= item.comercioNombre
+            td= item.tiendaNombre
+            td= item.usuarioNombre
+            td= `${item.monto} ${item.moneda}`
+            td= item.estado
+            td= item.pagoId ? "Si" : "No"
+            td= item.logisticaId ? "Si" : "No"
+            td
+              a(href=`/transacciones/${item._id}`) Ver
+              |  
+              a(href=`/transacciones/${item._id}/edit`) Editar
+              |  
+              form(method="post" action=`/transacciones/${item._id}/delete` style="display:inline")
+                button(type="submit") Eliminar

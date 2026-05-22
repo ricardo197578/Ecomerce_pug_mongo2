@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  h1 Detalle de pago
+  p
+    strong Transaccion ID:
+    |  #{item.transaccionId}
+  p
+    strong Estado:
+    |  #{item.estado}
+  p
+    strong Monto:
+    |  #{item.monto} #{item.moneda}
+  p
+    strong Referencia:
+    |  #{item.referenciaExterna}
+  p
+    strong Detalle:
+    |  #{item.detalle || "-"}
+  p
+    a(href=`/pagos/${item._id}/edit`) Editar
+    |  
+    a(href="/pagos") Volver al listado

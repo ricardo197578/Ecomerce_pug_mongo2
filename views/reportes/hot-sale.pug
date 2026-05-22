@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+  h1 Reporte Hot Sale
+  p Generado: #{data.generadoEn}
+  ul
+    li Total transacciones: #{data.summary.totalTransacciones}
+    li Total pagos: #{data.summary.totalPagos}
+    li GMV total: #{data.summary.gmvTotal}
+    li GMV aprobado: #{data.summary.gmvAprobado}
+    li Ticket promedio: #{data.summary.ticketPromedio}
+    li Tasa aprobacion pagos: #{data.summary.tasaAprobacionPagos}
+    li Tasa rechazo pagos: #{data.summary.tasaRechazoPagos}
+    li Tasa transacciones pendientes: #{data.summary.tasaTransaccionesPendientes}
+
+  h2 Alertas
+  ul
+    each alerta in data.alertas
+      li #{alerta.nivel}: #{alerta.mensaje}
+
+  h2 Top comercios por volumen
+  if !data.topComerciosPorVolumen.length
+    p Sin datos.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Volumen
+      tbody
+        each item in data.topComerciosPorVolumen
+          tr
+            td= item.comercioNombre
+            td= item.volumen

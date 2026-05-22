@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+  h1 Detalle de comercio
+  p
+    strong Nombre:
+    |  #{item.nombre}
+  p
+    strong CUIT:
+    |  #{item.cuit}
+  p
+    strong Email:
+    |  #{item.email}
+  p
+    strong Activo:
+    |  #{item.activo ? "Si" : "No"}
+
+  p
+    a(href=`/comercios/${item._id}/edit`) Editar
+    |  
+    a(href="/comercios") Volver al listado

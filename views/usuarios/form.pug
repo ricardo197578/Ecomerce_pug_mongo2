@@ -1,0 +1,25 @@
+extends ../layout
+
+block content
+  h1= title
+  if errorMessage
+    p.error= errorMessage
+  form(method="post" action=`/usuarios${formAction || ""}`)
+    label(for="comercioId") Comercio
+    select(name="comercioId" id="comercioId" required)
+      option(value="") Seleccionar comercio
+      each comercio in comercios
+        option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
+    label(for="tiendaId") Tienda
+    select(name="tiendaId" id="tiendaId" required)
+      option(value="") Seleccionar tienda
+      each tienda in tiendas
+        option(value=tienda._id selected=String(formData.tiendaId || "") === String(tienda._id))= `${tienda.nombre} - ${tienda.comercioNombre}`
+    input(type="text" name="nombre" placeholder="Nombre" value=formData.nombre)
+    input(type="email" name="email" placeholder="Email" value=formData.email)
+    label
+      input(type="checkbox" name="activo" checked=formData.activo)
+      |  Activo
+    button(type="submit")= submitLabel || "Guardar"
+  p
+    a(href="/usuarios") Volver al listado

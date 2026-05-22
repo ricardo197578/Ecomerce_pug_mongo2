@@ -1,0 +1,39 @@
+extends layout
+
+block content
+  h1 Panel Operativo
+  h2 Operacion comercial
+  ul
+    li Comercios: #{counts.comercios}
+    li Tiendas: #{counts.tiendas}
+    li Usuarios: #{counts.usuarios}
+    li Transacciones: #{counts.transacciones}
+    li Pagos: #{counts.pagos}
+    li Logisticas: #{counts.logisticas}
+
+  h2 Reportes operativos
+  ul
+    li
+      a(href="/reportes/conciliacion") Conciliacion
+    li
+      a(href="/reportes/hot-sale") Hot Sale
+
+  h2 Operaciones
+  ul
+    li
+      a(href="/logisticas") Ver logisticas
+
+  h2 Gestion de plataforma | CodeNova
+  if !isPlatformAdmin
+    p Esta seccion requiere login.
+    p
+      a(href="/platform/login") Ingresar como admin de plataforma
+  else
+    ul
+      li Suscripciones: #{counts.suscripciones}
+      li
+        a(href="/suscripciones") Administrar suscripciones
+      li
+        a(href="/reportes/facturacion") Facturacion
+    form(method="post" action="/platform/logout")
+      button(type="submit") Cerrar sesion plataforma

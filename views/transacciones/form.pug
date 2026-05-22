@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+  h1= title
+  if errorMessage
+    p.error= errorMessage
+  form(method="post" action=`/transacciones${formAction || ""}`)
+    label(for="comercioId") Comercio
+    select(name="comercioId" id="comercioId" required)
+      option(value="") Seleccionar comercio
+      each comercio in comercios
+        option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
+    label(for="tiendaId") Tienda
+    select(name="tiendaId" id="tiendaId" required)
+      option(value="") Seleccionar tienda
+      each tienda in tiendas
+        option(value=tienda._id selected=String(formData.tiendaId || "") === String(tienda._id))= `${tienda.nombre} - ${tienda.comercioNombre}`
+    label(for="usuarioId") Usuario
+    select(name="usuarioId" id="usuarioId" required)
+      option(value="") Seleccionar usuario
+      each usuario in usuarios
+        option(value=usuario._id selected=String(formData.usuarioId || "") === String(usuario._id))= `${usuario.nombre} (${usuario.email}) - ${usuario.tiendaNombre}`
+    input(type="number" step="0.01" name="monto" placeholder="Monto" value=formData.monto)
+    input(type="text" name="moneda" placeholder="Moneda" value=formData.moneda)
+    input(type="text" name="descripcion" placeholder="Descripcion" value=formData.descripcion)
+    button(type="submit")= submitLabel || "Guardar"
+  p
+    a(href="/transacciones") Volver al listado

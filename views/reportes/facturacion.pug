@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  h1 Reporte de facturacion
+  ul
+    li Cantidad suscripciones: #{data.cantidadSuscripciones}
+    li Total cuotas: #{data.montoTotalCuotas}
+    li Total comisiones: #{data.montoTotalComisiones}
+    li Total facturar: #{data.montoTotalFacturar}
+
+  if !data.facturas.length
+    p No hay facturas para mostrar.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Plan
+          th Cuota
+          th Base comisionable
+          th % Comision
+          th Monto comision
+          th Total facturar
+      tbody
+        each item in data.facturas
+          tr
+            td= item.comercioNombre
+            td= item.planNombre
+            td= item.cuotaMensual
+            td= item.baseComisionable
+            td= item.comisionPorcentaje
+            td= item.montoComision
+            td= item.totalFacturar

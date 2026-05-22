@@ -1,0 +1,32 @@
+extends ../layout
+
+block content
+  h1 Suscripciones
+  a(href="/suscripciones/new") Nueva suscripcion
+  if !items.length
+    p No hay suscripciones cargadas.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Plan
+          th Cuota
+          th Comision
+          th Estado
+          th Acciones
+      tbody
+        each item in items
+          tr
+            td= item.comercioNombre
+            td= item.planNombre
+            td= `${item.cuotaMensual} ${item.moneda}`
+            td= `${item.comisionPorcentaje}%`
+            td= item.estado
+            td
+              a(href=`/suscripciones/${item._id}`) Ver
+              |  
+              a(href=`/suscripciones/${item._id}/edit`) Editar
+              |  
+              form(method="post" action=`/suscripciones/${item._id}/delete` style="display:inline")
+                button(type="submit") Eliminar

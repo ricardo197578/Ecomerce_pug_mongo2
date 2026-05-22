@@ -1,0 +1,29 @@
+extends ../layout
+
+block content
+  h1 Detalle de suscripcion
+  p
+    strong Comercio ID:
+    |  #{item.comercioId}
+  p
+    strong Plan:
+    |  #{item.planNombre}
+  p
+    strong Cuota mensual:
+    |  #{item.cuotaMensual} #{item.moneda}
+  p
+    strong Comision:
+    |  #{item.comisionPorcentaje}%
+  p
+    strong Estado:
+    |  #{item.estado}
+  p
+    strong Inicio:
+    |  #{item.fechaInicio}
+  p
+    strong Renovacion:
+    |  #{item.fechaRenovacion}
+  p
+    a(href=`/suscripciones/${item._id}/edit`) Editar
+    |  
+    a(href="/suscripciones") Volver al listado

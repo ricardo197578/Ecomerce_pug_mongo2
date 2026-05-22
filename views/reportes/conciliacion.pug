@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  h1 Reporte de conciliacion
+  p Generado: #{data.generadoEn}
+  ul
+    li Transacciones analizadas: #{data.resumen.transaccionesAnalizadas}
+    li Pagos analizados: #{data.resumen.pagosAnalizados}
+    li Inconsistencias: #{data.resumen.totalInconsistencias}
+
+  if !data.inconsistencias.length
+    p Sin inconsistencias detectadas.
+  else
+    table
+      thead
+        tr
+          th Tipo
+          th Transaccion
+          th Pago
+          th Detalle
+      tbody
+        each item in data.inconsistencias
+          tr
+            td= item.tipo
+            td= item.transaccionId || "-"
+            td= item.pagoId || "-"
+            td
+              if item.tipo === "ESTADO_DESCUADRADO"
+                | TX #{item.estadoTransaccion} vs Pago #{item.estadoPago}
+              else if item.tipo === "MONTO_DESCUADRADO"
+                | TX #{item.montoTransaccion} #{item.monedaTransaccion} vs Pago #{item.montoPago} #{item.monedaPago}
+              else
+                | -

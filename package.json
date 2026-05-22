@@ -1,0 +1,25 @@
+{
+  "name": "ecomerce_pug_mongo",
+  "version": "1.0.0",
+  "description": "Proyecto backend e-commerce con Express, Pug y MongoDB",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.18.1",
+    "mongoose": "^9.6.2",
+    "pug": "^3.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

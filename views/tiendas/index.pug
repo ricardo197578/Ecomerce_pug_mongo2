@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+  h1 Tiendas
+  a(href="/tiendas/new") Nueva tienda
+  if !items.length
+    p No hay tiendas cargadas.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Nombre
+          th Descripcion
+          th Activa
+          th Acciones
+      tbody
+        each item in items
+          tr
+            td= item.comercioNombre
+            td= item.nombre
+            td= item.descripcion || "-"
+            td= item.activa ? "Si" : "No"
+            td
+              a(href=`/tiendas/${item._id}`) Ver
+              |  
+              a(href=`/tiendas/${item._id}/edit`) Editar
+              |  
+              form(method="post" action=`/tiendas/${item._id}/delete` style="display:inline")
+                button(type="submit") Eliminar

@@ -1,0 +1,26 @@
+extends ../layout
+
+block content
+  h1 Detalle de transaccion
+  p
+    strong Comercio ID:
+    |  #{item.comercioId}
+  p
+    strong Tienda ID:
+    |  #{item.tiendaId}
+  p
+    strong Usuario ID:
+    |  #{item.usuarioId}
+  p
+    strong Monto:
+    |  #{item.monto} #{item.moneda}
+  p
+    strong Estado:
+    |  #{item.estado}
+  p
+    strong Descripcion:
+    |  #{item.descripcion || "-"}
+  p
+    a(href=`/transacciones/${item._id}/edit`) Editar
+    |  
+    a(href="/transacciones") Volver al listado

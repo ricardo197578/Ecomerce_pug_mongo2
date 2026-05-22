@@ -1,0 +1,23 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title= title
+    style.
+      body { font-family: "Segoe UI", sans-serif; margin: 24px; }
+      nav a { margin-right: 12px; }
+      table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      .error { color: #b00020; }
+  body
+    nav
+      a(href="/") Inicio
+      a(href="/comercios") Comercios
+      a(href="/tiendas") Tiendas
+      a(href="/usuarios") Usuarios
+      a(href="/transacciones") Transacciones
+      a(href="/pagos") Pagos
+      a(href="/logisticas") Logisticas
+      a(href="/suscripciones") Suscripciones
+    block content

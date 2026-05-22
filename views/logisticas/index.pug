@@ -1,0 +1,36 @@
+extends ../layout
+
+block content
+  h1 Logisticas
+  a(href="/logisticas/new") Nueva logistica
+  if !items.length
+    p No hay operaciones logisticas generadas.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Usuario
+          th Estado
+          th Seguimiento
+          th Detalle
+          th Acciones
+      tbody
+        each item in items
+          tr
+            td= item.comercioNombre
+            td= item.usuarioNombre
+            td= item.estado
+            td= item.codigoSeguimiento
+            td= item.detalle || "-"
+            td
+              a(href=`/logisticas/${item._id}`) Ver
+              |  
+              a(href=`/logisticas/${item._id}/edit`) Editar
+              |  
+              if item.estado !== "DESPACHADA" && item.estado !== "ENTREGADA" && item.estado !== "CANCELADA"
+                form(method="post" action=`/logisticas/${item._id}/despachar` style="display:inline")
+                  button(type="submit") Despachar
+                |  
+              form(method="post" action=`/logisticas/${item._id}/delete` style="display:inline")
+                button(type="submit") Eliminar

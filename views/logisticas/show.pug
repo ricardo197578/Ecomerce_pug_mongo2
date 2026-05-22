@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  h1 Detalle de logistica
+  p
+    strong Transaccion ID:
+    |  #{item.transaccionId}
+  p
+    strong Estado:
+    |  #{item.estado}
+  p
+    strong Codigo seguimiento:
+    |  #{item.codigoSeguimiento}
+  p
+    strong Transportista:
+    |  #{item.transportista}
+  p
+    strong Detalle:
+    |  #{item.detalle || "-"}
+  p
+    a(href=`/logisticas/${item._id}/edit`) Editar
+    |  
+    a(href="/logisticas") Volver al listado

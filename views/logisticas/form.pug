@@ -1,0 +1,24 @@
+extends ../layout
+
+block content
+  h1= title
+  if errorMessage
+    p.error= errorMessage
+  form(method="post" action=`/logisticas${formAction || ""}`)
+    label(for="transaccionId") Transaccion aprobada
+    select(name="transaccionId" id="transaccionId" required)
+      option(value="") Seleccionar transaccion
+      each transaccion in transacciones
+        option(value=transaccion._id selected=String(formData.transaccionId || "") === String(transaccion._id))= `${transaccion.monto} ${transaccion.moneda} - ${transaccion.estado}`
+    label(for="estado") Estado
+    select(name="estado" id="estado" required)
+      option(value="PENDIENTE" selected=formData.estado === "PENDIENTE") PENDIENTE
+      option(value="EN_PREPARACION" selected=formData.estado === "EN_PREPARACION") EN_PREPARACION
+      option(value="DESPACHADA" selected=formData.estado === "DESPACHADA") DESPACHADA
+      option(value="ENTREGADA" selected=formData.estado === "ENTREGADA") ENTREGADA
+      option(value="CANCELADA" selected=formData.estado === "CANCELADA") CANCELADA
+    input(type="text" name="transportista" placeholder="Transportista" value=formData.transportista)
+    input(type="text" name="detalle" placeholder="Detalle" value=formData.detalle)
+    button(type="submit")= submitLabel || "Guardar"
+  p
+    a(href="/logisticas") Volver al listado

@@ -1,0 +1,32 @@
+extends ../layout
+
+block content
+  h1 Pagos
+  a(href="/pagos/new") Nuevo pago
+  if !items.length
+    p No hay pagos cargados.
+  else
+    table
+      thead
+        tr
+          th Comercio
+          th Usuario
+          th Estado
+          th Monto
+          th Referencia
+          th Acciones
+      tbody
+        each item in items
+          tr
+            td= item.comercioNombre
+            td= item.usuarioNombre
+            td= item.estado
+            td= `${item.monto} ${item.moneda}`
+            td= item.referenciaExterna
+            td
+              a(href=`/pagos/${item._id}`) Ver
+              |  
+              a(href=`/pagos/${item._id}/edit`) Editar
+              |  
+              form(method="post" action=`/pagos/${item._id}/delete` style="display:inline")
+                button(type="submit") Eliminar

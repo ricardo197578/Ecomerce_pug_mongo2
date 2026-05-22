@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  h1= title
+  if errorMessage
+    p.error= errorMessage
+  form(method="post" action=`/comercios${formAction || ""}`)
+    input(type="text" name="nombre" placeholder="Nombre" value=formData.nombre)
+    input(type="text" name="cuit" placeholder="CUIT" value=formData.cuit)
+    input(type="email" name="email" placeholder="Email" value=formData.email)
+    label
+      input(type="checkbox" name="activo" checked=formData.activo)
+      |  Activo
+    button(type="submit")= submitLabel || "Guardar"
+  p
+    a(href="/comercios") Volver al listado
