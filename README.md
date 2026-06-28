@@ -249,6 +249,131 @@ Notas:
 
 ## Instalacion y ejecucion
 
+## Como probar el proyecto desde cero
+
+Esta seccion esta pensada para cualquier persona que descargue el repositorio y quiera probarlo localmente.
+
+### Requisitos previos
+
+- Node.js instalado
+- npm instalado
+- MongoDB disponible
+  - puede ser local, o
+  - puede ser remoto usando MongoDB Atlas
+- Git para clonar el repositorio
+
+### Paso 1. Clonar el repositorio
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd Ecomerce_pug_mongo2
+```
+
+### Paso 2. Instalar dependencias
+
+```bash
+npm install
+```
+
+### Paso 3. Crear el archivo `.env`
+
+Crear un archivo `.env` en la raiz del proyecto con este contenido minimo:
+
+```env
+NODE_ENV=development
+PORT=3002
+MONGODB_URI=mongodb://127.0.0.1:27017/ecomerce_pug_mongo
+SESSION_SECRET=replace-with-a-long-random-secret
+SESSION_COOKIE_NAME=codenova.sid
+BCRYPT_SALT_ROUNDS=10
+SEED_PLATFORM_ADMIN_EMAIL=admin@codenova.local
+SEED_PLATFORM_ADMIN_PASSWORD=ChangeMe123!
+```
+
+Si MongoDB no corre en tu maquina local, reemplazar `MONGODB_URI` por la cadena real de tu instancia remota.
+
+### Paso 4. Verificar que MongoDB este funcionando
+
+- Si usas Mongo local, asegurate de que el servicio este levantado.
+- Si usas Mongo Atlas, verificá que la URI del `.env` sea valida y que tu IP tenga acceso.
+
+### Paso 5. Crear el administrador inicial de plataforma
+
+```bash
+npm run seed:platform-admin
+```
+
+Este comando crea o actualiza la cuenta `PLATFORM_ADMIN` usando las credenciales definidas en:
+
+- `SEED_PLATFORM_ADMIN_EMAIL`
+- `SEED_PLATFORM_ADMIN_PASSWORD`
+
+### Paso 6. Levantar la aplicacion
+
+En desarrollo:
+
+```bash
+npm run dev
+```
+
+O en modo normal:
+
+```bash
+npm start
+```
+
+### Paso 7. Ingresar al sistema
+
+Abrir en el navegador:
+
+```text
+http://localhost:3002
+```
+
+### Paso 8. Probar el acceso de plataforma
+
+1. Ir a `http://localhost:3002/platform/login`
+2. Iniciar sesion con el email y password del seed
+3. Verificar acceso a:
+   - `/comercios`
+   - `/cuentas-comercio`
+   - `/suscripciones`
+   - `/reportes/facturacion`
+
+### Paso 9. Crear un comercio y su cuenta
+
+1. Entrar a `/comercios`
+2. Crear un comercio nuevo
+3. Entrar a `/cuentas-comercio`
+4. Crear una cuenta asociada a ese comercio
+5. Si el rol es `COMMERCE_USER`, asignarle tambien una tienda
+
+### Paso 10. Probar el acceso del comercio
+
+1. Cerrar sesion de plataforma
+2. Ir a `http://localhost:3002/login`
+3. Ingresar con la cuenta creada en `/cuentas-comercio`
+
+### Paso 11. Validar comportamiento por rol
+
+- `COMMERCE_ADMIN`
+  - debe ver y administrar todo su comercio
+- `COMMERCE_USER`
+  - debe quedar limitado a su tienda
+  - no debe poder crear nuevas tiendas
+- `PLATFORM_ADMIN`
+  - debe conservar acceso total global
+
+### Paso 12. Si algo falla
+
+Revisar especialmente:
+
+- que `MONGODB_URI` sea correcta
+- que MongoDB este disponible
+- que el `.env` exista en la raiz
+- que el seed de plataforma se haya ejecutado
+- que la cuenta de comercio haya sido creada desde `/cuentas-comercio`
+
 ### Instalar dependencias
 
 ```bash
