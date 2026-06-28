@@ -249,6 +249,21 @@ Notas:
 
 ## Instalacion y ejecucion
 
+## Deploy actual
+
+El proyecto ya fue desplegado para demostracion con esta infraestructura:
+
+- Base de datos: MongoDB Atlas
+- Backend completo: Render
+- URL publica: `https://ecommerce-pug-api.onrender.com`
+
+Notas sobre este deploy:
+
+- El backend desplegado usa la misma logica de autenticacion, roles y aislamiento documentada en este README.
+- Para probarlo en linea, primero se necesita una cuenta valida de `PLATFORM_ADMIN`, `COMMERCE_ADMIN` o `COMMERCE_USER` cargada en la base remota.
+- El acceso de plataforma sigue entrando por `/platform/login`.
+- El acceso de comercio sigue entrando por `/login`.
+
 ## Como probar el proyecto desde cero
 
 Esta seccion esta pensada para cualquier persona que descargue el repositorio y quiera probarlo localmente.
@@ -677,6 +692,7 @@ Hoy CodeNova ya funciona como plataforma multi-comercio con:
 - El alta operativa de nuevos clientes/comercios ya se hace desde la UI administrativa.
 - La seguridad implementada responde a un enfoque clasico y adecuado para aplicaciones server-rendered con sesion.
 - El proyecto ya expresa una separacion clara entre plataforma SaaS y panel de cliente.
+- La aplicacion ya cuenta con una version desplegada usando MongoDB Atlas + Render para demostracion online.
 
 ## Mejoras futuras posibles
 
