@@ -3,6 +3,51 @@
 CodeNova es una plataforma academica de e-commerce multi-comercio.
 El proyecto simula un SaaS donde un operador central administra comercios clientes y cada comercio opera su propio panel de trabajo.
 
+## Tabla de contenido
+
+- [Capturas de pantalla](#capturas-de-pantalla)
+- [Objetivo de la plataforma](#objetivo-de-la-plataforma)
+- [Alcance del proyecto](#alcance-del-proyecto)
+- [Stack](#stack)
+- [Arquitectura](#arquitectura)
+- [Modulos funcionales](#modulos-funcionales)
+- [Modelo de autenticacion y seguridad](#modelo-de-autenticacion-y-seguridad)
+- [Estado actual logrado](#estado-actual-logrado)
+- [Colaboracion con IA en esta implementacion](#colaboracion-con-ia-en-esta-implementacion)
+- [Variables de entorno](#variables-de-entorno)
+- [Instalacion y ejecucion](#instalacion-y-ejecucion)
+- [Deploy actual](#deploy-actual)
+- [Como probar el proyecto desde cero](#como-probar-el-proyecto-desde-cero)
+- [Flujo operativo recomendado](#flujo-operativo-recomendado)
+- [Guia rapida de uso y demo academica](#guia-rapida-de-uso-y-demo-academica)
+- [Rutas principales](#rutas-principales)
+- [Pruebas manuales sugeridas](#pruebas-manuales-sugeridas)
+- [Resumen corto](#resumen-corto)
+- [Observaciones finales](#observaciones-finales)
+- [Mejoras futuras posibles](#mejoras-futuras-posibles)
+
+## Capturas de pantalla
+
+### Home publico
+
+![Home de CodeNova](assets/homeCodeNova.png)
+
+### Login de plataforma
+
+![Login de plataforma CodeNova](assets/loginPataformaCodeNova.png)
+
+### Panel del admin de plataforma
+
+![Panel operativo del admin de plataforma](assets/panelOperativoAmdinPlataformaCodeNova.png)
+
+### Panel del admin de comercio
+
+![Panel operativo del admin de comercio](assets/panelOperativoAdminComercio.png)
+
+### Panel del usuario de comercio
+
+![Panel operativo del usuario de comercio](assets/panelOperativoUserComercio.png)
+
 ## Objetivo de la plataforma
 
 El sistema busca representar dos planos de negocio dentro de una misma aplicacion:
@@ -264,6 +309,16 @@ Notas sobre este deploy:
 - Para probarlo en linea, primero se necesita una cuenta valida de `PLATFORM_ADMIN`, `COMMERCE_ADMIN` o `COMMERCE_USER` cargada en la base remota.
 - El acceso de plataforma sigue entrando por `/platform/login`.
 - El acceso de comercio sigue entrando por `/login`.
+
+### Evidencia del deploy y la base de datos
+
+#### Backend desplegado en Render
+
+![Deploy en Render](assets/deployRender.png)
+
+#### Base de datos en MongoDB Atlas
+
+![Base de datos en MongoDB Atlas](assets/baseDatosMongoAtlas.png)
 
 ## Como probar el proyecto desde cero
 
