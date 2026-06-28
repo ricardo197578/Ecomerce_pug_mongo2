@@ -2,21 +2,37 @@ extends ../layout
 
 block content
   h1= title
-  if errorMessage
-    p.error= errorMessage
-  form(method="post" action=`/suscripciones${formAction || ""}`)
-    label(for="comercioId") Comercio
-    select(name="comercioId" id="comercioId" required)
-      option(value="") Seleccionar comercio
-      each comercio in comercios
-        option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
-    input(type="text" name="planNombre" placeholder="Plan" value=formData.planNombre)
-    input(type="number" step="0.01" name="cuotaMensual" placeholder="Cuota" value=formData.cuotaMensual)
-    input(type="number" step="0.01" name="comisionPorcentaje" placeholder="Comision %" value=formData.comisionPorcentaje)
-    input(type="text" name="moneda" placeholder="Moneda" value=formData.moneda)
-    input(type="text" name="estado" placeholder="Estado" value=formData.estado)
-    input(type="text" name="fechaInicio" placeholder="YYYY-MM-DD" value=formData.fechaInicio)
-    input(type="text" name="fechaRenovacion" placeholder="YYYY-MM-DD" value=formData.fechaRenovacion)
-    button(type="submit")= submitLabel || "Guardar"
-  p
-    a(href="/suscripciones") Volver al listado
+  .card.form-wrap
+    if errorMessage
+      .alert.alert-error= errorMessage
+    form(method="post" action=`/suscripciones${formAction || ""}`)
+      .form-group
+        label(for="comercioId") Comercio
+        select#comercioId(name="comercioId" required)
+          option(value="") Seleccionar comercio
+          each comercio in comercios
+            option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
+      .form-group
+        label(for="planNombre") Plan
+        input#planNombre(type="text" name="planNombre" placeholder="Nombre del plan" value=formData.planNombre)
+      .form-group
+        label(for="cuotaMensual") Cuota mensual
+        input#cuotaMensual(type="number" step="0.01" name="cuotaMensual" placeholder="0.00" value=formData.cuotaMensual)
+      .form-group
+        label(for="comisionPorcentaje") Comisión (%)
+        input#comisionPorcentaje(type="number" step="0.01" name="comisionPorcentaje" placeholder="0.00" value=formData.comisionPorcentaje)
+      .form-group
+        label(for="moneda") Moneda
+        input#moneda(type="text" name="moneda" placeholder="ARS / USD" value=formData.moneda)
+      .form-group
+        label(for="estado") Estado
+        input#estado(type="text" name="estado" placeholder="Estado" value=formData.estado)
+      .form-group
+        label(for="fechaInicio") Fecha inicio
+        input#fechaInicio(type="text" name="fechaInicio" placeholder="YYYY-MM-DD" value=formData.fechaInicio)
+      .form-group
+        label(for="fechaRenovacion") Fecha renovación
+        input#fechaRenovacion(type="text" name="fechaRenovacion" placeholder="YYYY-MM-DD" value=formData.fechaRenovacion)
+      .actions(style="margin-top:8px")
+        button.btn.btn-primary(type="submit")= submitLabel || "Guardar"
+        a.btn.btn-secondary(href="/suscripciones") Cancelar

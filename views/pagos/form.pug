@@ -2,20 +2,25 @@ extends ../layout
 
 block content
   h1= title
-  if errorMessage
-    p.error= errorMessage
-  form(method="post" action=`/pagos${formAction || ""}`)
-    label(for="transaccionId") Transaccion
-    select(name="transaccionId" id="transaccionId" required)
-      option(value="") Seleccionar transaccion
-      each transaccion in transacciones
-        option(value=transaccion._id selected=String(formData.transaccionId || "") === String(transaccion._id))= `${transaccion.comercioNombre} | ${transaccion.usuarioNombre} | ${transaccion.monto} ${transaccion.moneda} - ${transaccion.estado} | ${transaccion.descripcion || "Sin descripcion"}`
-    label(for="estado") Estado
-    select(name="estado" id="estado" required)
-      option(value="PENDIENTE" selected=formData.estado === "PENDIENTE") PENDIENTE
-      option(value="APROBADO" selected=formData.estado === "APROBADO") APROBADO
-      option(value="RECHAZADO" selected=formData.estado === "RECHAZADO") RECHAZADO
-    input(type="text" name="detalle" placeholder="Detalle" value=formData.detalle)
-    button(type="submit")= submitLabel || "Guardar"
-  p
-    a(href="/pagos") Volver al listado
+  .card.form-wrap
+    if errorMessage
+      .alert.alert-error= errorMessage
+    form(method="post" action=`/pagos${formAction || ""}`)
+      .form-group
+        label(for="transaccionId") Transacción
+        select#transaccionId(name="transaccionId" required)
+          option(value="") Seleccionar transacción
+          each transaccion in transacciones
+            option(value=transaccion._id selected=String(formData.transaccionId || "") === String(transaccion._id))= `${transaccion.comercioNombre} | ${transaccion.usuarioNombre} | ${transaccion.monto} ${transaccion.moneda} - ${transaccion.estado} | ${transaccion.descripcion || "Sin descripción"}`
+      .form-group
+        label(for="estado") Estado
+        select#estado(name="estado" required)
+          option(value="PENDIENTE" selected=formData.estado === "PENDIENTE") PENDIENTE
+          option(value="APROBADO" selected=formData.estado === "APROBADO") APROBADO
+          option(value="RECHAZADO" selected=formData.estado === "RECHAZADO") RECHAZADO
+      .form-group
+        label(for="detalle") Detalle
+        input#detalle(type="text" name="detalle" placeholder="Detalle opcional" value=formData.detalle)
+      .actions(style="margin-top:8px")
+        button.btn.btn-primary(type="submit")= submitLabel || "Guardar"
+        a.btn.btn-secondary(href="/pagos") Cancelar

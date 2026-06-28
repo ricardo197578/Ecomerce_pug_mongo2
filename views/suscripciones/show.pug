@@ -1,29 +1,31 @@
 extends ../layout
 
 block content
-  h1 Detalle de suscripcion
-  p
-    strong Comercio ID:
-    |  #{item.comercioId}
-  p
-    strong Plan:
-    |  #{item.planNombre}
-  p
-    strong Cuota mensual:
-    |  #{item.cuotaMensual} #{item.moneda}
-  p
-    strong Comision:
-    |  #{item.comisionPorcentaje}%
-  p
-    strong Estado:
-    |  #{item.estado}
-  p
-    strong Inicio:
-    |  #{item.fechaInicio}
-  p
-    strong Renovacion:
-    |  #{item.fechaRenovacion}
-  p
-    a(href=`/suscripciones/${item._id}/edit`) Editar
-    |  
-    a(href="/suscripciones") Volver al listado
+  .page-header
+    h1 Detalle de suscripción
+    .actions
+      a.btn.btn-secondary(href=`/suscripciones/${item._id}/edit`) Editar
+      a.btn.btn-secondary(href="/suscripciones") ← Listado
+  .card
+    ul.detail-list
+      li
+        span.detail-label Comercio ID
+        span= item.comercioId
+      li
+        span.detail-label Plan
+        span= item.planNombre
+      li
+        span.detail-label Cuota mensual
+        span= `${item.cuotaMensual} ${item.moneda}`
+      li
+        span.detail-label Comisión
+        span= `${item.comisionPorcentaje}%`
+      li
+        span.detail-label Estado
+        span.badge.badge-blue= item.estado
+      li
+        span.detail-label Inicio
+        span= item.fechaInicio
+      li
+        span.detail-label Renovación
+        span= item.fechaRenovacion

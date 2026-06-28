@@ -1,36 +1,38 @@
 extends ../layout
 
 block content
-  h1 Logisticas
-  a(href="/logisticas/new") Nueva logistica
+  .page-header
+    h1 Logísticas
+    a.btn.btn-primary(href="/logisticas/new") + Nueva logística
   if !items.length
-    p No hay operaciones logisticas generadas.
+    .empty-state No hay operaciones logísticas generadas.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Usuario
-          th Estado
-          th Seguimiento
-          th Detalle
-          th Acciones
-      tbody
-        each item in items
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.usuarioNombre
-            td= item.estado
-            td= item.codigoSeguimiento
-            td= item.detalle || "-"
-            td
-              a(href=`/logisticas/${item._id}`) Ver
-              |  
-              a(href=`/logisticas/${item._id}/edit`) Editar
-              |  
-              if item.estado !== "DESPACHADA" && item.estado !== "ENTREGADA" && item.estado !== "CANCELADA"
-                form(method="post" action=`/logisticas/${item._id}/despachar` style="display:inline")
-                  button(type="submit") Despachar
-                |  
-              form(method="post" action=`/logisticas/${item._id}/delete` style="display:inline")
-                button(type="submit") Eliminar
+            th Comercio
+            th Usuario
+            th Estado
+            th Seguimiento
+            th Detalle
+            th Acciones
+        tbody
+          each item in items
+            tr
+              td= item.comercioNombre
+              td= item.usuarioNombre
+              td
+                - const ec = item.estado === 'ENTREGADA' ? 'badge-green' : item.estado === 'CANCELADA' ? 'badge-red' : item.estado === 'DESPACHADA' ? 'badge-blue' : 'badge-yellow'
+                span(class=`badge ${ec}`)= item.estado
+              td= item.codigoSeguimiento
+              td= item.detalle || "—"
+              td
+                .actions
+                  a.btn.btn-sm.btn-secondary(href=`/logisticas/${item._id}`) Ver
+                  a.btn.btn-sm.btn-secondary(href=`/logisticas/${item._id}/edit`) Editar
+                  if item.estado !== "DESPACHADA" && item.estado !== "ENTREGADA" && item.estado !== "CANCELADA"
+                    form(method="post" action=`/logisticas/${item._id}/despachar` style="display:inline")
+                      button.btn.btn-sm.btn-primary(type="submit") Despachar
+                  form(method="post" action=`/logisticas/${item._id}/delete` style="display:inline")
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar

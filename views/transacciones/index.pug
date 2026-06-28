@@ -1,36 +1,46 @@
 extends ../layout
 
 block content
-  h1 Transacciones
-  a(href="/transacciones/new") Nueva transaccion
+  .page-header
+    h1 Transacciones
+    a.btn.btn-primary(href="/transacciones/new") + Nueva transacción
   if !items.length
-    p No hay transacciones cargadas.
+    .empty-state No hay transacciones cargadas.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Tienda
-          th Usuario
-          th Monto
-          th Estado
-          th Pago
-          th Logistica
-          th Acciones
-      tbody
-        each item in items
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.tiendaNombre
-            td= item.usuarioNombre
-            td= `${item.monto} ${item.moneda}`
-            td= item.estado
-            td= item.pagoId ? "Si" : "No"
-            td= item.logisticaId ? "Si" : "No"
-            td
-              a(href=`/transacciones/${item._id}`) Ver
-              |  
-              a(href=`/transacciones/${item._id}/edit`) Editar
-              |  
-              form(method="post" action=`/transacciones/${item._id}/delete` style="display:inline")
-                button(type="submit") Eliminar
+            th Comercio
+            th Tienda
+            th Usuario
+            th Monto
+            th Estado
+            th Pago
+            th Logística
+            th Acciones
+        tbody
+          each item in items
+            tr
+              td= item.comercioNombre
+              td= item.tiendaNombre
+              td= item.usuarioNombre
+              td= `${item.monto} ${item.moneda}`
+              td
+                span.badge.badge-blue= item.estado
+              td
+                if item.pagoId
+                  span.badge.badge-green Sí
+                else
+                  span.badge.badge-gray No
+              td
+                if item.logisticaId
+                  span.badge.badge-green Sí
+                else
+                  span.badge.badge-gray No
+              td
+                .actions
+                  a.btn.btn-sm.btn-secondary(href=`/transacciones/${item._id}`) Ver
+                  a.btn.btn-sm.btn-secondary(href=`/transacciones/${item._id}/edit`) Editar
+                  form(method="post" action=`/transacciones/${item._id}/delete` style="display:inline")
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar

@@ -1,10 +1,16 @@
 extends ../layout
 
 block content
-  h1 Login plataforma | CodeNova
-  if errorMessage
-    p.error= errorMessage
-  form(method="post" action="/platform/login")
-    input(type="email" name="email" placeholder="Email" value=formData.email required)
-    input(type="password" name="password" placeholder="Password" required)
-    button(type="submit") Ingresar
+  .card(style="max-width:400px;margin:40px auto")
+    h1(style="text-align:center;margin-bottom:4px") Acceso Admin
+    p(style="text-align:center;color:var(--gray-500);font-size:.85rem;margin-bottom:24px") CodeNova · Panel de Plataforma
+    if errorMessage
+      .alert.alert-error= errorMessage
+    form(method="post" action="/platform/login")
+      .form-group
+        label(for="user") Usuario
+        input#user(type="text" name="user" placeholder="admin" required)
+      .form-group
+        label(for="password") Contraseña
+        input#password(type="password" name="password" placeholder="••••••••" required)
+      button.btn.btn-primary(type="submit" style="width:100%;justify-content:center;margin-top:8px") Ingresar

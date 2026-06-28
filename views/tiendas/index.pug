@@ -1,32 +1,35 @@
 extends ../layout
 
 block content
-  h1 Tiendas
-  if !isCommerceUser
-    a(href="/tiendas/new") Nueva tienda
+  .page-header
+    h1 Tiendas
+    a.btn.btn-primary(href="/tiendas/new") + Nueva tienda
   if !items.length
-    p No hay tiendas cargadas.
+    .empty-state No hay tiendas cargadas.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Nombre
-          th Descripcion
-          th Activa
-          th Acciones
-      tbody
-        each item in items
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.nombre
-            td= item.descripcion || "-"
-            td= item.activa ? "Si" : "No"
-            td
-              a(href=`/tiendas/${item._id}`) Ver
-              if !isCommerceUser
-                |  
-                a(href=`/tiendas/${item._id}/edit`) Editar
-                |  
-                form(method="post" action=`/tiendas/${item._id}/delete` style="display:inline")
-                  button(type="submit") Eliminar
+            th Comercio
+            th Nombre
+            th Descripción
+            th Activa
+            th Acciones
+        tbody
+          each item in items
+            tr
+              td= item.comercioNombre
+              td= item.nombre
+              td= item.descripcion || "—"
+              td
+                if item.activa
+                  span.badge.badge-green Sí
+                else
+                  span.badge.badge-red No
+              td
+                .actions
+                  a.btn.btn-sm.btn-secondary(href=`/tiendas/${item._id}`) Ver
+                  a.btn.btn-sm.btn-secondary(href=`/tiendas/${item._id}/edit`) Editar
+                  form(method="post" action=`/tiendas/${item._id}/delete` style="display:inline")
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar

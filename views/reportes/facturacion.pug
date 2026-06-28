@@ -1,33 +1,44 @@
 extends ../layout
 
 block content
-  h1 Reporte de facturacion
-  ul
-    li Cantidad suscripciones: #{data.cantidadSuscripciones}
-    li Total cuotas: #{data.montoTotalCuotas}
-    li Total comisiones: #{data.montoTotalComisiones}
-    li Total facturar: #{data.montoTotalFacturar}
+  h1 Reporte de facturación
+
+  .stats-grid
+    .stat-card
+      .stat-label Suscripciones
+      .stat-value= data.cantidadSuscripciones
+    .stat-card
+      .stat-label Total cuotas
+      .stat-value= data.montoTotalCuotas
+    .stat-card
+      .stat-label Total comisiones
+      .stat-value= data.montoTotalComisiones
+    .stat-card
+      .stat-label Total a facturar
+      .stat-value= data.montoTotalFacturar
 
   if !data.facturas.length
-    p No hay facturas para mostrar.
+    .empty-state No hay facturas para mostrar.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Plan
-          th Cuota
-          th Base comisionable
-          th % Comision
-          th Monto comision
-          th Total facturar
-      tbody
-        each item in data.facturas
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.planNombre
-            td= item.cuotaMensual
-            td= item.baseComisionable
-            td= item.comisionPorcentaje
-            td= item.montoComision
-            td= item.totalFacturar
+            th Comercio
+            th Plan
+            th Cuota
+            th Base comisionable
+            th % Comisión
+            th Monto comisión
+            th Total facturar
+        tbody
+          each item in data.facturas
+            tr
+              td= item.comercioNombre
+              td= item.planNombre
+              td= item.cuotaMensual
+              td= item.baseComisionable
+              td= item.comisionPorcentaje
+              td= item.montoComision
+              td
+                strong= item.totalFacturar

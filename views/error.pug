@@ -1,6 +1,9 @@
 extends layout
 
 block content
-  h1= errorTitle
-  p Codigo: #{statusCode}
-  p= errorMessage
+  .card(style="max-width:480px;text-align:center;padding:48px 32px")
+    p(style="font-size:3rem;margin-bottom:8px") ⚠️
+    h1(style="margin-bottom:8px")= errorTitle
+    p(style="color:var(--gray-500);margin-bottom:4px") Código: #{statusCode}
+    p(style="color:var(--gray-700)")= errorMessage
+    a.btn.btn-secondary(href="/" style="margin-top:24px") ← Volver al inicio

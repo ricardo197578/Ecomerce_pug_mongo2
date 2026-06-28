@@ -1,26 +1,28 @@
 extends ../layout
 
 block content
-  h1 Detalle de transaccion
-  p
-    strong Comercio ID:
-    |  #{item.comercioId}
-  p
-    strong Tienda ID:
-    |  #{item.tiendaId}
-  p
-    strong Usuario ID:
-    |  #{item.usuarioId}
-  p
-    strong Monto:
-    |  #{item.monto} #{item.moneda}
-  p
-    strong Estado:
-    |  #{item.estado}
-  p
-    strong Descripcion:
-    |  #{item.descripcion || "-"}
-  p
-    a(href=`/transacciones/${item._id}/edit`) Editar
-    |  
-    a(href="/transacciones") Volver al listado
+  .page-header
+    h1 Detalle de transacción
+    .actions
+      a.btn.btn-secondary(href=`/transacciones/${item._id}/edit`) Editar
+      a.btn.btn-secondary(href="/transacciones") ← Listado
+  .card
+    ul.detail-list
+      li
+        span.detail-label Comercio ID
+        span= item.comercioId
+      li
+        span.detail-label Tienda ID
+        span= item.tiendaId
+      li
+        span.detail-label Usuario ID
+        span= item.usuarioId
+      li
+        span.detail-label Monto
+        span= `${item.monto} ${item.moneda}`
+      li
+        span.detail-label Estado
+        span.badge.badge-blue= item.estado
+      li
+        span.detail-label Descripción
+        span= item.descripcion || "—"

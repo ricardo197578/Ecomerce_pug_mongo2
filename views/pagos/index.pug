@@ -1,32 +1,35 @@
 extends ../layout
 
 block content
-  h1 Pagos
-  a(href="/pagos/new") Nuevo pago
+  .page-header
+    h1 Pagos
+    a.btn.btn-primary(href="/pagos/new") + Nuevo pago
   if !items.length
-    p No hay pagos cargados.
+    .empty-state No hay pagos cargados.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Usuario
-          th Estado
-          th Monto
-          th Referencia
-          th Acciones
-      tbody
-        each item in items
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.usuarioNombre
-            td= item.estado
-            td= `${item.monto} ${item.moneda}`
-            td= item.referenciaExterna
-            td
-              a(href=`/pagos/${item._id}`) Ver
-              |  
-              a(href=`/pagos/${item._id}/edit`) Editar
-              |  
-              form(method="post" action=`/pagos/${item._id}/delete` style="display:inline")
-                button(type="submit") Eliminar
+            th Comercio
+            th Usuario
+            th Estado
+            th Monto
+            th Referencia
+            th Acciones
+        tbody
+          each item in items
+            tr
+              td= item.comercioNombre
+              td= item.usuarioNombre
+              td
+                - const estadoClass = item.estado === 'APROBADO' ? 'badge-green' : item.estado === 'RECHAZADO' ? 'badge-red' : 'badge-yellow'
+                span(class=`badge ${estadoClass}`)= item.estado
+              td= `${item.monto} ${item.moneda}`
+              td= item.referenciaExterna
+              td
+                .actions
+                  a.btn.btn-sm.btn-secondary(href=`/pagos/${item._id}`) Ver
+                  a.btn.btn-sm.btn-secondary(href=`/pagos/${item._id}/edit`) Editar
+                  form(method="post" action=`/pagos/${item._id}/delete` style="display:inline")
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar
