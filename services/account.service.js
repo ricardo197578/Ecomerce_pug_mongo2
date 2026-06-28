@@ -8,20 +8,21 @@ import { handleMongoUnique } from "./helpers.js";
 const COMMERCE_ROLES = new Set(["COMMERCE_ADMIN", "COMMERCE_USER"]);
 
 export const accountService = {
-  async getAll() {
-    const accounts = await accountRepository.findAll({
-      role: { $in: [...COMMERCE_ROLES] }
-    });
+  async getAll(authContext = null) {
+    const filter = buildAccountFilter(authContext);
+    const accounts = await accountRepository.findAll(filter);
 
     return accounts.map(toSafeAccount);
   },
 
-  async getById(id) {
-    return loadCommerceAccount(id);
+  async getById(id, authContext = null) {
+    return loadCommerceAccount(id, false, authContext);
   },
 
-  async create(payload) {
+  async create(payload, authContext = null) {
+    assertCanManageAccounts(authContext);
     const normalized = normalizeCreatePayload(payload);
+    applyCreationScope(normalized, authContext);
     validateCreatePayload(normalized);
     await ensureComercioExists(normalized.comercioId);
     await ensureTiendaScope(normalized);
@@ -44,9 +45,11 @@ export const accountService = {
     }
   },
 
-  async update(id, payload) {
-    const current = await loadCommerceAccount(id, true);
+  async update(id, payload, authContext = null) {
+    assertCanManageAccounts(authContext);
+    const current = await loadCommerceAccount(id, true, authContext);
     const normalized = normalizeUpdatePayload(current, payload);
+    applyUpdateScope(normalized, current, authContext);
     validateUpdatePayload(normalized);
     await ensureComercioExists(normalized.comercioId);
     await ensureTiendaScope(normalized);
@@ -78,8 +81,9 @@ export const accountService = {
     }
   },
 
-  async remove(id) {
-    await loadCommerceAccount(id, true);
+  async remove(id, authContext = null) {
+    assertCanManageAccounts(authContext);
+    await loadCommerceAccount(id, true, authContext);
     const deleted = await accountRepository.remove(id);
     if (!deleted) {
       throw new HttpError(404, "NOT_FOUND", "Cuenta no encontrada.");
@@ -87,14 +91,87 @@ export const accountService = {
   }
 };
 
-async function loadCommerceAccount(id, includePasswordHash = false) {
+async function loadCommerceAccount(id, includePasswordHash = false, authContext = null) {
   const account = await accountRepository.findById(id);
 
   if (!account || !COMMERCE_ROLES.has(account.role)) {
     throw new HttpError(404, "NOT_FOUND", "Cuenta no encontrada.");
   }
 
+  ensureAccountAccess(account, authContext);
+
   return includePasswordHash ? account : toSafeAccount(account);
+}
+
+function buildAccountFilter(authContext) {
+  const filter = {
+    role: { $in: [...COMMERCE_ROLES] }
+  };
+
+  if (!authContext) {
+    return filter;
+  }
+
+  assertCanManageAccounts(authContext);
+
+  if (authContext.isCommerceAdmin) {
+    filter.comercioId = authContext.comercioId;
+    filter.role = "COMMERCE_USER";
+  }
+
+  return filter;
+}
+
+function assertCanManageAccounts(authContext) {
+  if (!authContext) {
+    return;
+  }
+
+  if (authContext.isPlatformAdmin || authContext.isCommerceAdmin) {
+    return;
+  }
+
+  throw new HttpError(403, "FORBIDDEN", "No tenes permisos para administrar cuentas de comercio.");
+}
+
+function ensureAccountAccess(account, authContext) {
+  if (!authContext || authContext.isPlatformAdmin) {
+    return account;
+  }
+
+  if (!authContext.isCommerceAdmin || !authContext.comercioId) {
+    throw new HttpError(403, "FORBIDDEN", "No tenes permisos para administrar cuentas de comercio.");
+  }
+
+  if (String(account.comercioId || "") !== String(authContext.comercioId)) {
+    throw new HttpError(404, "NOT_FOUND", "Cuenta no encontrada.");
+  }
+
+  if (account.role !== "COMMERCE_USER") {
+    throw new HttpError(404, "NOT_FOUND", "Cuenta no encontrada.");
+  }
+
+  return account;
+}
+
+function applyCreationScope(payload, authContext) {
+  if (!authContext?.isCommerceAdmin) {
+    return payload;
+  }
+
+  payload.comercioId = authContext.comercioId || payload.comercioId;
+  payload.role = "COMMERCE_USER";
+  return payload;
+}
+
+function applyUpdateScope(payload, current, authContext) {
+  if (!authContext?.isCommerceAdmin) {
+    return payload;
+  }
+
+  payload.comercioId = current.comercioId;
+  payload.role = "COMMERCE_USER";
+  return payload;
 }
 
 async function ensureComercioExists(comercioId) {
