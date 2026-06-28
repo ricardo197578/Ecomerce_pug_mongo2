@@ -1,34 +1,54 @@
 extends ../layout
 
 block content
-  h1 Reporte Hot Sale
-  p Generado: #{data.generadoEn}
-  ul
-    li Total transacciones: #{data.summary.totalTransacciones}
-    li Total pagos: #{data.summary.totalPagos}
-    li GMV total: #{data.summary.gmvTotal}
-    li GMV aprobado: #{data.summary.gmvAprobado}
-    li Ticket promedio: #{data.summary.ticketPromedio}
-    li Tasa aprobacion pagos: #{data.summary.tasaAprobacionPagos}
-    li Tasa rechazo pagos: #{data.summary.tasaRechazoPagos}
-    li Tasa transacciones pendientes: #{data.summary.tasaTransaccionesPendientes}
+  h1 Reporte Hot Sale 🔥
+  p(style="color:var(--gray-500);margin-bottom:20px;font-size:.9rem") Generado: #{data.generadoEn}
+
+  .stats-grid
+    .stat-card
+      .stat-label Total transacciones
+      .stat-value= data.summary.totalTransacciones
+    .stat-card
+      .stat-label Total pagos
+      .stat-value= data.summary.totalPagos
+    .stat-card
+      .stat-label GMV total
+      .stat-value= data.summary.gmvTotal
+    .stat-card
+      .stat-label GMV aprobado
+      .stat-value= data.summary.gmvAprobado
+    .stat-card
+      .stat-label Ticket promedio
+      .stat-value= data.summary.ticketPromedio
+    .stat-card
+      .stat-label Aprobación
+      .stat-value= data.summary.tasaAprobacionPagos
 
   h2 Alertas
-  ul
-    each alerta in data.alertas
-      li #{alerta.nivel}: #{alerta.mensaje}
+  if !data.alertas.length
+    p(style="color:var(--gray-500)") Sin alertas.
+  else
+    .card(style="padding:16px")
+      each alerta in data.alertas
+        .alert(class=alerta.nivel === 'CRITICO' ? 'alert-error' : 'alert-error' style="margin-bottom:8px")
+          strong= alerta.nivel
+          |  — #{alerta.mensaje}
 
   h2 Top comercios por volumen
   if !data.topComerciosPorVolumen.length
-    p Sin datos.
+    .empty-state Sin datos.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Volumen
-      tbody
-        each item in data.topComerciosPorVolumen
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.volumen
+            th #
+            th Comercio
+            th Volumen
+        tbody
+          each item, idx in data.topComerciosPorVolumen
+            tr
+              td= idx + 1
+              td= item.comercioNombre
+              td
+                strong= item.volumen

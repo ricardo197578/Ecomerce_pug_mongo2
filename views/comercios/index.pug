@@ -1,30 +1,35 @@
 extends ../layout
 
 block content
-  h1 Comercios
-  a(href="/comercios/new") Nuevo comercio
+  .page-header
+    h1 Comercios
+    a.btn.btn-primary(href="/comercios/new") + Nuevo comercio
   if !items.length
-    p No hay comercios cargados.
+    .empty-state No hay comercios cargados.
   else
-    table
-      thead
-        tr
-          th Nombre
-          th CUIT
-          th Email
-          th Activo
-          th Acciones
-      tbody
-        each item in items
+    .table-wrap
+      table
+        thead
           tr
-            td= item.nombre
-            td= item.cuit
-            td= item.email
-            td= item.activo ? "Si" : "No"
-            td
-              a(href=`/comercios/${item._id}`) Ver
-              |  
-              a(href=`/comercios/${item._id}/edit`) Editar
-              |  
-              form(method="post" action=`/comercios/${item._id}/delete` style="display:inline")
-                button(type="submit") Eliminar
+            th Nombre
+            th CUIT
+            th Email
+            th Activo
+            th Acciones
+        tbody
+          each item in items
+            tr
+              td= item.nombre
+              td= item.cuit
+              td= item.email
+              td
+                if item.activo
+                  span.badge.badge-green Sí
+                else
+                  span.badge.badge-red No
+              td
+                .actions
+                  a.btn.btn-sm.btn-secondary(href=`/comercios/${item._id}`) Ver
+                  a.btn.btn-sm.btn-secondary(href=`/comercios/${item._id}/edit`) Editar
+                  form(method="post" action=`/comercios/${item._id}/delete` style="display:inline")
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar

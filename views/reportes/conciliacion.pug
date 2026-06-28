@@ -1,33 +1,42 @@
 extends ../layout
 
 block content
-  h1 Reporte de conciliacion
-  p Generado: #{data.generadoEn}
-  ul
-    li Transacciones analizadas: #{data.resumen.transaccionesAnalizadas}
-    li Pagos analizados: #{data.resumen.pagosAnalizados}
-    li Inconsistencias: #{data.resumen.totalInconsistencias}
+  h1 Reporte de conciliación
+  p(style="color:var(--gray-500);margin-bottom:20px;font-size:.9rem") Generado: #{data.generadoEn}
+
+  .stats-grid(style="grid-template-columns:repeat(3,1fr)")
+    .stat-card
+      .stat-label Transacciones analizadas
+      .stat-value= data.resumen.transaccionesAnalizadas
+    .stat-card
+      .stat-label Pagos analizados
+      .stat-value= data.resumen.pagosAnalizados
+    .stat-card
+      .stat-label Inconsistencias
+      .stat-value(style=data.resumen.totalInconsistencias > 0 ? "color:var(--danger)" : "")= data.resumen.totalInconsistencias
 
   if !data.inconsistencias.length
-    p Sin inconsistencias detectadas.
+    .empty-state ✅ Sin inconsistencias detectadas.
   else
-    table
-      thead
-        tr
-          th Tipo
-          th Transaccion
-          th Pago
-          th Detalle
-      tbody
-        each item in data.inconsistencias
+    .table-wrap
+      table
+        thead
           tr
-            td= item.tipo
-            td= item.transaccionId || "-"
-            td= item.pagoId || "-"
-            td
-              if item.tipo === "ESTADO_DESCUADRADO"
-                | TX #{item.estadoTransaccion} vs Pago #{item.estadoPago}
-              else if item.tipo === "MONTO_DESCUADRADO"
-                | TX #{item.montoTransaccion} #{item.monedaTransaccion} vs Pago #{item.montoPago} #{item.monedaPago}
-              else
-                | -
+            th Tipo
+            th Transacción
+            th Pago
+            th Detalle
+        tbody
+          each item in data.inconsistencias
+            tr
+              td
+                span.badge.badge-red= item.tipo
+              td= item.transaccionId || "—"
+              td= item.pagoId || "—"
+              td
+                if item.tipo === "ESTADO_DESCUADRADO"
+                  | TX #{item.estadoTransaccion} vs Pago #{item.estadoPago}
+                else if item.tipo === "MONTO_DESCUADRADO"
+                  | TX #{item.montoTransaccion} #{item.monedaTransaccion} vs Pago #{item.montoPago} #{item.monedaPago}
+                else
+                  | —

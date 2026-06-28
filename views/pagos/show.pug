@@ -1,23 +1,26 @@
 extends ../layout
 
 block content
-  h1 Detalle de pago
-  p
-    strong Transaccion ID:
-    |  #{item.transaccionId}
-  p
-    strong Estado:
-    |  #{item.estado}
-  p
-    strong Monto:
-    |  #{item.monto} #{item.moneda}
-  p
-    strong Referencia:
-    |  #{item.referenciaExterna}
-  p
-    strong Detalle:
-    |  #{item.detalle || "-"}
-  p
-    a(href=`/pagos/${item._id}/edit`) Editar
-    |  
-    a(href="/pagos") Volver al listado
+  .page-header
+    h1 Detalle de pago
+    .actions
+      a.btn.btn-secondary(href=`/pagos/${item._id}/edit`) Editar
+      a.btn.btn-secondary(href="/pagos") ← Listado
+  .card
+    ul.detail-list
+      li
+        span.detail-label Transacción ID
+        span= item.transaccionId
+      li
+        span.detail-label Estado
+        - const estadoClass = item.estado === 'APROBADO' ? 'badge-green' : item.estado === 'RECHAZADO' ? 'badge-red' : 'badge-yellow'
+        span(class=`badge ${estadoClass}`)= item.estado
+      li
+        span.detail-label Monto
+        span= `${item.monto} ${item.moneda}`
+      li
+        span.detail-label Referencia
+        span= item.referenciaExterna
+      li
+        span.detail-label Detalle
+        span= item.detalle || "—"

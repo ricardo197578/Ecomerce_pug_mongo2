@@ -2,23 +2,25 @@ extends ../layout
 
 block content
   h1= title
-  if errorMessage
-    p.error= errorMessage
-  form(method="post" action=`/tiendas${formAction || ""}`)
-    if canSelectComercio
-      label(for="comercioId") Comercio
-      select(name="comercioId" id="comercioId" required)
-        option(value="") Seleccionar comercio
-        each comercio in comercios
-          option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
-    else
-      p Comercio: #{selectedComercio ? `${selectedComercio.nombre} (${selectedComercio.cuit})` : "Sin comercio"}
-      input(type="hidden" name="comercioId" value=formData.comercioId || (selectedComercio ? selectedComercio._id : ""))
-    input(type="text" name="nombre" placeholder="Nombre" value=formData.nombre)
-    input(type="text" name="descripcion" placeholder="Descripcion" value=formData.descripcion)
-    label
-      input(type="checkbox" name="activa" checked=formData.activa)
-      |  Activa
-    button(type="submit")= submitLabel || "Guardar"
-  p
-    a(href="/tiendas") Volver al listado
+  .card.form-wrap
+    if errorMessage
+      .alert.alert-error= errorMessage
+    form(method="post" action=`/tiendas${formAction || ""}`)
+      .form-group
+        label(for="comercioId") Comercio
+        select#comercioId(name="comercioId" required)
+          option(value="") Seleccionar comercio
+          each comercio in comercios
+            option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
+      .form-group
+        label(for="nombre") Nombre
+        input#nombre(type="text" name="nombre" placeholder="Nombre de la tienda" value=formData.nombre)
+      .form-group
+        label(for="descripcion") Descripción
+        input#descripcion(type="text" name="descripcion" placeholder="Descripción opcional" value=formData.descripcion)
+      .form-group.checkbox-row
+        input#activa(type="checkbox" name="activa" checked=formData.activa)
+        label(for="activa") Activa
+      .actions(style="margin-top:8px")
+        button.btn.btn-primary(type="submit")= submitLabel || "Guardar"
+        a.btn.btn-secondary(href="/tiendas") Cancelar

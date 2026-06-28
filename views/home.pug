@@ -1,50 +1,50 @@
 extends layout
 
 block content
-  if !isAuthenticated
-    h1 Bienvenido a CodeNova
-    p Selecciona el acceso correspondiente para continuar.
-    ul
-      li
-        a(href="/login") Ingresar al panel del comercio
-      li
-        a(href="/platform/login") Ingresar al panel de plataforma
-  else
-    h1 Panel Operativo
-    h2 Operacion comercial
-    ul
-      li Comercios: #{counts.comercios}
-      li Tiendas: #{counts.tiendas}
-      li Usuarios: #{counts.usuarios}
-      li Transacciones: #{counts.transacciones}
-      li Pagos: #{counts.pagos}
-      li Logisticas: #{counts.logisticas}
+  h1 Panel Operativo
 
-    h2 Operaciones
-    ul
-      li
-        a(href="/tiendas") Ver tiendas
-      li
-        a(href="/usuarios") Ver usuarios
-      li
-        a(href="/logisticas") Ver logisticas
+  h2 Operación comercial
+  .stats-grid
+    .stat-card
+      .stat-label Comercios
+      .stat-value= counts.comercios
+    .stat-card
+      .stat-label Tiendas
+      .stat-value= counts.tiendas
+    .stat-card
+      .stat-label Usuarios
+      .stat-value= counts.usuarios
+    .stat-card
+      .stat-label Transacciones
+      .stat-value= counts.transacciones
+    .stat-card
+      .stat-label Pagos
+      .stat-value= counts.pagos
+    .stat-card
+      .stat-label Logísticas
+      .stat-value= counts.logisticas
 
-    h2 Reportes operativos
-    ul
-      li
-        a(href="/reportes/conciliacion") Conciliacion
-      li
-        a(href="/reportes/hot-sale") Hot Sale
+  h2 Reportes operativos
+  .actions(style="margin-bottom:24px")
+    a.btn.btn-secondary(href="/reportes/conciliacion") 📊 Conciliación
+    a.btn.btn-secondary(href="/reportes/hot-sale") 🔥 Hot Sale
 
-    if isPlatformAdmin
-      h2 Gestion de plataforma | CodeNova
-      ul
-        li Suscripciones: #{counts.suscripciones}
-        li
-          a(href="/comercios") Administrar comercios
-        li
-          a(href="/cuentas-comercio") Administrar cuentas de comercio
-        li
-          a(href="/suscripciones") Administrar suscripciones
-        li
-          a(href="/reportes/facturacion") Facturacion
+  h2 Operaciones
+  .actions(style="margin-bottom:24px")
+    a.btn.btn-secondary(href="/logisticas") 🚚 Ver logísticas
+
+  h2 Gestión de plataforma
+  .card(style="max-width:480px")
+    if !isPlatformAdmin
+      p(style="color:var(--gray-500);margin-bottom:12px") Esta sección requiere login de administrador.
+      a.btn.btn-primary(href="/platform/login") Ingresar como admin
+    else
+      .stats-grid(style="grid-template-columns:1fr")
+        .stat-card
+          .stat-label Suscripciones
+          .stat-value= counts.suscripciones
+      .actions(style="margin-bottom:16px")
+        a.btn.btn-secondary(href="/suscripciones") Administrar suscripciones
+        a.btn.btn-secondary(href="/reportes/facturacion") 🧾 Facturación
+      form(method="post" action="/platform/logout")
+        button.btn.btn-danger(type="submit") Cerrar sesión

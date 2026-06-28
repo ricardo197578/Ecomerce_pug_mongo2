@@ -1,32 +1,37 @@
 extends ../layout
 
 block content
-  h1 Usuarios
-  a(href="/usuarios/new") Nuevo usuario
+  .page-header
+    h1 Usuarios
+    a.btn.btn-primary(href="/usuarios/new") + Nuevo usuario
   if !items.length
-    p No hay usuarios cargados.
+    .empty-state No hay usuarios cargados.
   else
-    table
-      thead
-        tr
-          th Comercio
-          th Tienda
-          th Nombre
-          th Email
-          th Activo
-          th Acciones
-      tbody
-        each item in items
+    .table-wrap
+      table
+        thead
           tr
-            td= item.comercioNombre
-            td= item.tiendaNombre
-            td= item.nombre
-            td= item.email
-            td= item.activo ? "Si" : "No"
-            td
-              a(href=`/usuarios/${item._id}`) Ver
-              |  
-              a(href=`/usuarios/${item._id}/edit`) Editar
-              |  
-              form(method="post" action=`/usuarios/${item._id}/delete` style="display:inline")
-                button(type="submit") Eliminar
+            th Comercio
+            th Tienda
+            th Nombre
+            th Email
+            th Activo
+            th Acciones
+        tbody
+          each item in items
+            tr
+              td= item.comercioNombre
+              td= item.tiendaNombre
+              td= item.nombre
+              td= item.email
+              td
+                if item.activo
+                  span.badge.badge-green Sí
+                else
+                  span.badge.badge-red No
+              td
+                .actions
+                  a.btn.btn-sm.btn-secondary(href=`/usuarios/${item._id}`) Ver
+                  a.btn.btn-sm.btn-secondary(href=`/usuarios/${item._id}/edit`) Editar
+                  form(method="post" action=`/usuarios/${item._id}/delete` style="display:inline")
+                    button.btn.btn-sm.btn-danger(type="submit") Eliminar

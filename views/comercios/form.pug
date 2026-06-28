@@ -2,15 +2,22 @@ extends ../layout
 
 block content
   h1= title
-  if errorMessage
-    p.error= errorMessage
-  form(method="post" action=`/comercios${formAction || ""}`)
-    input(type="text" name="nombre" placeholder="Nombre" value=formData.nombre)
-    input(type="text" name="cuit" placeholder="CUIT" value=formData.cuit)
-    input(type="email" name="email" placeholder="Email" value=formData.email)
-    label
-      input(type="checkbox" name="activo" checked=formData.activo)
-      |  Activo
-    button(type="submit")= submitLabel || "Guardar"
-  p
-    a(href="/comercios") Volver al listado
+  .card.form-wrap
+    if errorMessage
+      .alert.alert-error= errorMessage
+    form(method="post" action=`/comercios${formAction || ""}`)
+      .form-group
+        label(for="nombre") Nombre
+        input#nombre(type="text" name="nombre" placeholder="Nombre del comercio" value=formData.nombre)
+      .form-group
+        label(for="cuit") CUIT
+        input#cuit(type="text" name="cuit" placeholder="20-12345678-9" value=formData.cuit)
+      .form-group
+        label(for="email") Email
+        input#email(type="email" name="email" placeholder="contacto@comercio.com" value=formData.email)
+      .form-group.checkbox-row
+        input#activo(type="checkbox" name="activo" checked=formData.activo)
+        label(for="activo") Activo
+      .actions(style="margin-top:8px")
+        button.btn.btn-primary(type="submit")= submitLabel || "Guardar"
+        a.btn.btn-secondary(href="/comercios") Cancelar

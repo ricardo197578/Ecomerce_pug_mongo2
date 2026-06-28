@@ -1,21 +1,26 @@
 extends ../layout
 
 block content
-  h1 Detalle de comercio
-  p
-    strong Nombre:
-    |  #{item.nombre}
-  p
-    strong CUIT:
-    |  #{item.cuit}
-  p
-    strong Email:
-    |  #{item.email}
-  p
-    strong Activo:
-    |  #{item.activo ? "Si" : "No"}
-
-  p
-    a(href=`/comercios/${item._id}/edit`) Editar
-    |  
-    a(href="/comercios") Volver al listado
+  .page-header
+    h1 Detalle de comercio
+    .actions
+      a.btn.btn-secondary(href=`/comercios/${item._id}/edit`) Editar
+      a.btn.btn-secondary(href="/comercios") ← Listado
+  .card
+    ul.detail-list
+      li
+        span.detail-label Nombre
+        span= item.nombre
+      li
+        span.detail-label CUIT
+        span= item.cuit
+      li
+        span.detail-label Email
+        span= item.email
+      li
+        span.detail-label Activo
+        span
+          if item.activo
+            span.badge.badge-green Sí
+          else
+            span.badge.badge-red No
