@@ -1,6 +1,5 @@
-export function requirePlatformAuth(req, res, next) {
-  if (req.session?.isPlatformAdmin) {
-    return next();
-  }
-  return res.redirect("/platform/login");
-}
+import { requireRole } from "./requireRole.js";
+
+export const requirePlatformAuth = requireRole(["PLATFORM_ADMIN"], {
+  loginPath: "/platform/login"
+});

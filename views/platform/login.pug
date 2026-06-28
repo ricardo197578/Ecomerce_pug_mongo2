@@ -2,11 +2,9 @@ extends ../layout
 
 block content
   h1 Login plataforma | CodeNova
-  p Usuario: admin
-  p Password: codenova123
   if errorMessage
     p.error= errorMessage
   form(method="post" action="/platform/login")
-    input(type="text" name="user" placeholder="Usuario" required)
+    input(type="email" name="email" placeholder="Email" value=formData.email required)
     input(type="password" name="password" placeholder="Password" required)
     button(type="submit") Ingresar

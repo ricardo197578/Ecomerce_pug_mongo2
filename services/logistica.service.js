@@ -1,5 +1,6 @@
 import { logisticaRepository } from "../repositories/logistica.repository.js";
 import { transaccionRepository } from "../repositories/transaccion.repository.js";
+import { buildScopeFilter, ensureTenantAccess } from "../utils/authContext.js";
 import { HttpError } from "../utils/httpError.js";
 
 const ESTADOS_LOGISTICA = new Set(["PENDIENTE", "EN_PREPARACION", "DESPACHADA", "ENTREGADA", "CANCELADA"]);
@@ -17,27 +18,29 @@ function trackingCode(id) {
 }
 
 export const logisticaService = {
-  getAll() {
-    return logisticaRepository.findAll();
+  getAll(authContext = null) {
+    return logisticaRepository.findAll(buildScopeFilter(authContext));
   },
-  async getById(id) {
+  async getById(id, authContext = null) {
     const item = await logisticaRepository.findById(id);
     if (!item) throw new HttpError(404, "NOT_FOUND", "Logistica no encontrada.");
+    ensureTenantAccess(item, authContext, "Logistica");
     return item;
   },
-  async create(payload) {
+  async create(payload, authContext = null) {
     const transaccionId = String(payload.transaccionId || "").trim();
     if (!transaccionId) {
       throw new HttpError(400, "VALIDATION_ERROR", "La transaccion es obligatoria.");
     }
-    const created = await this.createDesdeTransaccion(transaccionId);
+    const created = await this.createDesdeTransaccion(transaccionId, authContext);
     const hasCustomData = payload.estado || payload.transportista || payload.detalle;
     if (!hasCustomData) return created;
-    return this.update(created._id, payload);
+    return this.update(created._id, payload, authContext);
   },
-  async createDesdeTransaccion(transaccionId) {
+  async createDesdeTransaccion(transaccionId, authContext = null) {
     const transaccion = await transaccionRepository.findById(transaccionId);
     if (!transaccion) throw new HttpError(404, "NOT_FOUND", "Transaccion no encontrada.");
+    ensureTenantAccess(transaccion, authContext, "Transaccion");
     if (transaccion.estado !== "APROBADA") {
       throw new HttpError(422, "TRANSACCION_NOT_APPROVED", "La transaccion debe estar aprobada.");
     }
@@ -55,8 +58,8 @@ export const logisticaService = {
     await transaccionRepository.update(transaccionId, { logisticaId: created.id });
     return created;
   },
-  async update(id, payload) {
-    const current = await this.getById(id);
+  async update(id, payload, authContext = null) {
+    const current = await this.getById(id, authContext);
     const nextEstado = payload.estado
       ? String(payload.estado).trim().toUpperCase()
       : current.estado;
@@ -73,11 +76,11 @@ export const logisticaService = {
     });
     return updated;
   },
-  async despachar(id) {
-    return this.update(id, { estado: "DESPACHADA" });
+  async despachar(id, authContext = null) {
+    return this.update(id, { estado: "DESPACHADA" }, authContext);
   },
-  async remove(id) {
-    const current = await this.getById(id);
+  async remove(id, authContext = null) {
+    const current = await this.getById(id, authContext);
     const deleted = await logisticaRepository.remove(id);
     if (!deleted) throw new HttpError(404, "NOT_FOUND", "Logistica no encontrada.");
     await transaccionRepository.update(current.transaccionId, { logisticaId: null });

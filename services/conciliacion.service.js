@@ -1,5 +1,6 @@
 import { pagoRepository } from "../repositories/pago.repository.js";
 import { transaccionRepository } from "../repositories/transaccion.repository.js";
+import { buildScopeFilter } from "../utils/authContext.js";
 
 function estadoEsperado(estadoPago) {
   if (estadoPago === "APROBADO") return "APROBADA";
@@ -8,10 +9,12 @@ function estadoEsperado(estadoPago) {
 }
 
 export const conciliacionService = {
-  async conciliar() {
+  async conciliar(authContext = null) {
+    const filter = buildScopeFilter(authContext);
+
     const [transacciones, pagos] = await Promise.all([
-      transaccionRepository.findAll(),
-      pagoRepository.findAll()
+      transaccionRepository.findAll(filter),
+      pagoRepository.findAll(filter)
     ]);
     const transaccionesByAnyId = new Map();
     transacciones.forEach((item) => {

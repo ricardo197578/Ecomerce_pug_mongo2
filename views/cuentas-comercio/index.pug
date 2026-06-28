@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+  h1 Cuentas de comercio
+  a(href="/cuentas-comercio/new") Nueva cuenta
+  if !items.length
+    p No hay cuentas de comercio cargadas.
+  else
+    table
+      thead
+        tr
+          th Email
+          th Rol
+          th Comercio
+          th Tienda
+          th Activa
+          th Ultimo login
+          th Acciones
+      tbody
+        each item in items
+          tr
+            td= item.email
+            td= item.role
+            td= `${item.comercioNombre} (${item.comercioCuit})`
+            td= item.tiendaNombre || "-"
+            td= item.activo ? "Si" : "No"
+            td= item.lastLoginAt ? item.lastLoginAt : "-"
+            td
+              a(href=`/cuentas-comercio/${item._id}`) Ver
+              |  
+              a(href=`/cuentas-comercio/${item._id}/edit`) Editar
+              |  
+              form(method="post" action=`/cuentas-comercio/${item._id}/delete` style="display:inline")
+                button(type="submit") Eliminar

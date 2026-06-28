@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+  h1 Detalle de cuenta de comercio
+  p
+    strong Email:
+    |  #{item.email}
+  p
+    strong Rol:
+    |  #{item.role}
+  p
+    strong Comercio:
+    |  #{item.comercioNombre}
+  p
+    strong CUIT:
+    |  #{item.comercioCuit}
+  p
+    strong Tienda:
+    |  #{item.tiendaNombre || "-"}
+  p
+    strong Activa:
+    |  #{item.activo ? "Si" : "No"}
+  p
+    strong Ultimo login:
+    |  #{item.lastLoginAt || "-"}
+
+  p
+    a(href=`/cuentas-comercio/${item._id}/edit`) Editar
+    |  
+    a(href="/cuentas-comercio") Volver al listado

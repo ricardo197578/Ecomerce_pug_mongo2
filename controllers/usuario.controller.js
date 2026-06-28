@@ -1,13 +1,14 @@
 import { comercioService } from "../services/comercio.service.js";
 import { tiendaService } from "../services/tienda.service.js";
 import { usuarioService } from "../services/usuario.service.js";
+import { getAuthContext } from "../utils/authContext.js";
 
 const formDefaults = { comercioId: "", tiendaId: "", nombre: "", email: "", activo: true };
 
-async function loadFormOptions() {
+async function loadFormOptions(authContext) {
   const [comercios, tiendas] = await Promise.all([
-    comercioService.getAll(),
-    tiendaService.getAll()
+    comercioService.getAll(authContext),
+    tiendaService.getAll(authContext)
   ]);
   const comerciosById = new Map(comercios.map((comercio) => [String(comercio._id), comercio]));
   const tiendasView = tiendas.map((tienda) => {
@@ -17,16 +18,22 @@ async function loadFormOptions() {
       comercioNombre: comercio ? comercio.nombre : "Sin comercio"
     };
   });
-  return { comercios, tiendas: tiendasView };
+  return {
+    comercios,
+    tiendas: tiendasView,
+    canSelectComercio: !authContext.isCommerceActor,
+    selectedComercio: comercios[0] || null
+  };
 }
 
 export const usuarioController = {
-  async list(_req, res, next) {
+  async list(req, res, next) {
     try {
+      const authContext = getAuthContext(req);
       const [items, comercios, tiendas] = await Promise.all([
-        usuarioService.getAll(),
-        comercioService.getAll(),
-        tiendaService.getAll()
+        usuarioService.getAll(authContext),
+        comercioService.getAll(authContext),
+        tiendaService.getAll(authContext)
       ]);
       const comerciosById = new Map(comercios.map((comercio) => [String(comercio._id), comercio]));
       const tiendasById = new Map(tiendas.map((tienda) => [String(tienda._id), tienda]));
@@ -44,9 +51,10 @@ export const usuarioController = {
       next(error);
     }
   },
-  async showCreate(_req, res, next) {
+  async showCreate(req, res, next) {
     try {
-      const options = await loadFormOptions();
+      const authContext = getAuthContext(req);
+      const options = await loadFormOptions(authContext);
       res.render("usuarios/form", {
         title: "Nuevo Usuario",
         formData: formDefaults,
@@ -61,12 +69,14 @@ export const usuarioController = {
   },
   async create(req, res, next) {
     try {
-      await usuarioService.create(req.body);
+      const authContext = getAuthContext(req);
+      await usuarioService.create(req.body, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       if (error.statusCode && error.statusCode < 500) {
         try {
-          const options = await loadFormOptions();
+          const authContext = getAuthContext(req);
+          const options = await loadFormOptions(authContext);
           return res.status(error.statusCode).render("usuarios/form", {
             title: "Nuevo Usuario",
             formData: { ...formDefaults, ...req.body },
@@ -84,7 +94,8 @@ export const usuarioController = {
   },
   async showDetail(req, res, next) {
     try {
-      const item = await usuarioService.getById(req.params.id);
+      const authContext = getAuthContext(req);
+      const item = await usuarioService.getById(req.params.id, authContext);
       res.render("usuarios/show", { title: "Usuario", item });
     } catch (error) {
       next(error);
@@ -92,9 +103,10 @@ export const usuarioController = {
   },
   async showEdit(req, res, next) {
     try {
+      const authContext = getAuthContext(req);
       const [item, options] = await Promise.all([
-        usuarioService.getById(req.params.id),
-        loadFormOptions()
+        usuarioService.getById(req.params.id, authContext),
+        loadFormOptions(authContext)
       ]);
       res.render("usuarios/form", {
         title: "Editar Usuario",
@@ -110,12 +122,14 @@ export const usuarioController = {
   },
   async update(req, res, next) {
     try {
-      await usuarioService.update(req.params.id, req.body);
+      const authContext = getAuthContext(req);
+      await usuarioService.update(req.params.id, req.body, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       if (error.statusCode && error.statusCode < 500) {
         try {
-          const options = await loadFormOptions();
+          const authContext = getAuthContext(req);
+          const options = await loadFormOptions(authContext);
           return res.status(error.statusCode).render("usuarios/form", {
             title: "Editar Usuario",
             formData: { _id: req.params.id, ...formDefaults, ...req.body },
@@ -133,7 +147,8 @@ export const usuarioController = {
   },
   async remove(req, res, next) {
     try {
-      await usuarioService.remove(req.params.id);
+      const authContext = getAuthContext(req);
+      await usuarioService.remove(req.params.id, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       next(error);

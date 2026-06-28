@@ -1,13 +1,18 @@
 import { comercioRepository } from "../repositories/comercio.repository.js";
 import { pagoRepository } from "../repositories/pago.repository.js";
 import { transaccionRepository } from "../repositories/transaccion.repository.js";
+import { buildScopeFilter, resolveScopedComercioId } from "../utils/authContext.js";
 
 export const estadisticaService = {
-  async getHotSaleReport() {
+  async getHotSaleReport(authContext = null) {
+    const comercioId = resolveScopedComercioId(authContext, null);
+    const filter = buildScopeFilter(authContext);
     const [transacciones, pagos, comercios] = await Promise.all([
-      transaccionRepository.findAll(),
-      pagoRepository.findAll(),
-      comercioRepository.findAll()
+      transaccionRepository.findAll(filter),
+      pagoRepository.findAll(filter),
+      comercioId
+        ? comercioRepository.findById(comercioId).then((comercio) => (comercio ? [comercio] : []))
+        : comercioRepository.findAll()
     ]);
     const comerciosById = new Map(comercios.map((item) => [String(item._id), item]));
     const totalTransacciones = transacciones.length;

@@ -2,14 +2,15 @@ import { comercioService } from "../services/comercio.service.js";
 import { tiendaService } from "../services/tienda.service.js";
 import { transaccionService } from "../services/transaccion.service.js";
 import { usuarioService } from "../services/usuario.service.js";
+import { getAuthContext } from "../utils/authContext.js";
 
 const formDefaults = { comercioId: "", tiendaId: "", usuarioId: "", monto: "", moneda: "ARS", descripcion: "" };
 
-async function loadFormOptions() {
+async function loadFormOptions(authContext) {
   const [comercios, tiendas, usuarios] = await Promise.all([
-    comercioService.getAll(),
-    tiendaService.getAll(),
-    usuarioService.getAll()
+    comercioService.getAll(authContext),
+    tiendaService.getAll(authContext),
+    usuarioService.getAll(authContext)
   ]);
   const comerciosById = new Map(comercios.map((comercio) => [String(comercio._id), comercio]));
   const tiendasById = new Map(tiendas.map((tienda) => [String(tienda._id), tienda]));
@@ -30,17 +31,24 @@ async function loadFormOptions() {
     };
   });
 
-  return { comercios, tiendas: tiendasView, usuarios: usuariosView };
+  return {
+    comercios,
+    tiendas: tiendasView,
+    usuarios: usuariosView,
+    canSelectComercio: !authContext.isCommerceActor,
+    selectedComercio: comercios[0] || null
+  };
 }
 
 export const transaccionController = {
-  async list(_req, res, next) {
+  async list(req, res, next) {
     try {
+      const authContext = getAuthContext(req);
       const [items, comercios, tiendas, usuarios] = await Promise.all([
-        transaccionService.getAll(),
-        comercioService.getAll(),
-        tiendaService.getAll(),
-        usuarioService.getAll()
+        transaccionService.getAll(authContext),
+        comercioService.getAll(authContext),
+        tiendaService.getAll(authContext),
+        usuarioService.getAll(authContext)
       ]);
       const comerciosById = new Map(comercios.map((comercio) => [String(comercio._id), comercio]));
       const tiendasById = new Map(tiendas.map((tienda) => [String(tienda._id), tienda]));
@@ -61,9 +69,10 @@ export const transaccionController = {
       next(error);
     }
   },
-  async showCreate(_req, res, next) {
+  async showCreate(req, res, next) {
     try {
-      const options = await loadFormOptions();
+      const authContext = getAuthContext(req);
+      const options = await loadFormOptions(authContext);
       res.render("transacciones/form", {
         title: "Nueva Transaccion",
         formData: formDefaults,
@@ -78,12 +87,14 @@ export const transaccionController = {
   },
   async create(req, res, next) {
     try {
-      await transaccionService.create(req.body);
+      const authContext = getAuthContext(req);
+      await transaccionService.create(req.body, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       if (error.statusCode && error.statusCode < 500) {
         try {
-          const options = await loadFormOptions();
+          const authContext = getAuthContext(req);
+          const options = await loadFormOptions(authContext);
           return res.status(error.statusCode).render("transacciones/form", {
             title: "Nueva Transaccion",
             formData: { ...formDefaults, ...req.body },
@@ -101,7 +112,8 @@ export const transaccionController = {
   },
   async showDetail(req, res, next) {
     try {
-      const item = await transaccionService.getById(req.params.id);
+      const authContext = getAuthContext(req);
+      const item = await transaccionService.getById(req.params.id, authContext);
       res.render("transacciones/show", { title: "Transaccion", item });
     } catch (error) {
       next(error);
@@ -109,9 +121,10 @@ export const transaccionController = {
   },
   async showEdit(req, res, next) {
     try {
+      const authContext = getAuthContext(req);
       const [item, options] = await Promise.all([
-        transaccionService.getById(req.params.id),
-        loadFormOptions()
+        transaccionService.getById(req.params.id, authContext),
+        loadFormOptions(authContext)
       ]);
       res.render("transacciones/form", {
         title: "Editar Transaccion",
@@ -127,12 +140,14 @@ export const transaccionController = {
   },
   async update(req, res, next) {
     try {
-      await transaccionService.update(req.params.id, req.body);
+      const authContext = getAuthContext(req);
+      await transaccionService.update(req.params.id, req.body, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       if (error.statusCode && error.statusCode < 500) {
         try {
-          const options = await loadFormOptions();
+          const authContext = getAuthContext(req);
+          const options = await loadFormOptions(authContext);
           return res.status(error.statusCode).render("transacciones/form", {
             title: "Editar Transaccion",
             formData: { _id: req.params.id, ...formDefaults, ...req.body },
@@ -150,7 +165,8 @@ export const transaccionController = {
   },
   async remove(req, res, next) {
     try {
-      await transaccionService.remove(req.params.id);
+      const authContext = getAuthContext(req);
+      await transaccionService.remove(req.params.id, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       next(error);

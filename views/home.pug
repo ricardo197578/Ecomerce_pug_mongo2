@@ -1,39 +1,50 @@
 extends layout
 
 block content
-  h1 Panel Operativo
-  h2 Operacion comercial
-  ul
-    li Comercios: #{counts.comercios}
-    li Tiendas: #{counts.tiendas}
-    li Usuarios: #{counts.usuarios}
-    li Transacciones: #{counts.transacciones}
-    li Pagos: #{counts.pagos}
-    li Logisticas: #{counts.logisticas}
-
-  h2 Reportes operativos
-  ul
-    li
-      a(href="/reportes/conciliacion") Conciliacion
-    li
-      a(href="/reportes/hot-sale") Hot Sale
-
-  h2 Operaciones
-  ul
-    li
-      a(href="/logisticas") Ver logisticas
-
-  h2 Gestion de plataforma | CodeNova
-  if !isPlatformAdmin
-    p Esta seccion requiere login.
-    p
-      a(href="/platform/login") Ingresar como admin de plataforma
-  else
+  if !isAuthenticated
+    h1 Bienvenido a CodeNova
+    p Selecciona el acceso correspondiente para continuar.
     ul
-      li Suscripciones: #{counts.suscripciones}
       li
-        a(href="/suscripciones") Administrar suscripciones
+        a(href="/login") Ingresar al panel del comercio
       li
-        a(href="/reportes/facturacion") Facturacion
-    form(method="post" action="/platform/logout")
-      button(type="submit") Cerrar sesion plataforma
+        a(href="/platform/login") Ingresar al panel de plataforma
+  else
+    h1 Panel Operativo
+    h2 Operacion comercial
+    ul
+      li Comercios: #{counts.comercios}
+      li Tiendas: #{counts.tiendas}
+      li Usuarios: #{counts.usuarios}
+      li Transacciones: #{counts.transacciones}
+      li Pagos: #{counts.pagos}
+      li Logisticas: #{counts.logisticas}
+
+    h2 Operaciones
+    ul
+      li
+        a(href="/tiendas") Ver tiendas
+      li
+        a(href="/usuarios") Ver usuarios
+      li
+        a(href="/logisticas") Ver logisticas
+
+    h2 Reportes operativos
+    ul
+      li
+        a(href="/reportes/conciliacion") Conciliacion
+      li
+        a(href="/reportes/hot-sale") Hot Sale
+
+    if isPlatformAdmin
+      h2 Gestion de plataforma | CodeNova
+      ul
+        li Suscripciones: #{counts.suscripciones}
+        li
+          a(href="/comercios") Administrar comercios
+        li
+          a(href="/cuentas-comercio") Administrar cuentas de comercio
+        li
+          a(href="/suscripciones") Administrar suscripciones
+        li
+          a(href="/reportes/facturacion") Facturacion

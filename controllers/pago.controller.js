@@ -2,14 +2,15 @@ import { comercioService } from "../services/comercio.service.js";
 import { pagoService } from "../services/pago.service.js";
 import { transaccionService } from "../services/transaccion.service.js";
 import { usuarioService } from "../services/usuario.service.js";
+import { getAuthContext } from "../utils/authContext.js";
 
 const formDefaults = { transaccionId: "", estado: "PENDIENTE", detalle: "" };
 
-async function loadFormOptions() {
+async function loadFormOptions(authContext) {
   const [transacciones, comercios, usuarios] = await Promise.all([
-    transaccionService.getAll(),
-    comercioService.getAll(),
-    usuarioService.getAll()
+    transaccionService.getAll(authContext),
+    comercioService.getAll(authContext),
+    usuarioService.getAll(authContext)
   ]);
   const comerciosById = new Map(comercios.map((comercio) => [String(comercio._id), comercio]));
   const usuariosById = new Map(usuarios.map((usuario) => [String(usuario._id), usuario]));
@@ -26,12 +27,13 @@ async function loadFormOptions() {
 }
 
 export const pagoController = {
-  async list(_req, res, next) {
+  async list(req, res, next) {
     try {
+      const authContext = getAuthContext(req);
       const [items, comercios, usuarios] = await Promise.all([
-        pagoService.getAll(),
-        comercioService.getAll(),
-        usuarioService.getAll()
+        pagoService.getAll(authContext),
+        comercioService.getAll(authContext),
+        usuarioService.getAll(authContext)
       ]);
       const comerciosById = new Map(comercios.map((comercio) => [String(comercio._id), comercio]));
       const usuariosById = new Map(usuarios.map((usuario) => [String(usuario._id), usuario]));
@@ -49,9 +51,10 @@ export const pagoController = {
       next(error);
     }
   },
-  async showCreate(_req, res, next) {
+  async showCreate(req, res, next) {
     try {
-      const options = await loadFormOptions();
+      const authContext = getAuthContext(req);
+      const options = await loadFormOptions(authContext);
       res.render("pagos/form", {
         title: "Nuevo Pago",
         formData: formDefaults,
@@ -66,12 +69,14 @@ export const pagoController = {
   },
   async create(req, res, next) {
     try {
-      await pagoService.create(req.body);
+      const authContext = getAuthContext(req);
+      await pagoService.create(req.body, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       if (error.statusCode && error.statusCode < 500) {
         try {
-          const options = await loadFormOptions();
+          const authContext = getAuthContext(req);
+          const options = await loadFormOptions(authContext);
           return res.status(error.statusCode).render("pagos/form", {
             title: "Nuevo Pago",
             formData: { ...formDefaults, ...req.body },
@@ -89,7 +94,8 @@ export const pagoController = {
   },
   async showDetail(req, res, next) {
     try {
-      const item = await pagoService.getById(req.params.id);
+      const authContext = getAuthContext(req);
+      const item = await pagoService.getById(req.params.id, authContext);
       res.render("pagos/show", { title: "Pago", item });
     } catch (error) {
       next(error);
@@ -97,9 +103,10 @@ export const pagoController = {
   },
   async showEdit(req, res, next) {
     try {
+      const authContext = getAuthContext(req);
       const [item, options] = await Promise.all([
-        pagoService.getById(req.params.id),
-        loadFormOptions()
+        pagoService.getById(req.params.id, authContext),
+        loadFormOptions(authContext)
       ]);
       res.render("pagos/form", {
         title: "Editar Pago",
@@ -115,12 +122,14 @@ export const pagoController = {
   },
   async update(req, res, next) {
     try {
-      await pagoService.update(req.params.id, req.body);
+      const authContext = getAuthContext(req);
+      await pagoService.update(req.params.id, req.body, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       if (error.statusCode && error.statusCode < 500) {
         try {
-          const options = await loadFormOptions();
+          const authContext = getAuthContext(req);
+          const options = await loadFormOptions(authContext);
           return res.status(error.statusCode).render("pagos/form", {
             title: "Editar Pago",
             formData: { _id: req.params.id, ...formDefaults, ...req.body },
@@ -138,7 +147,8 @@ export const pagoController = {
   },
   async remove(req, res, next) {
     try {
-      await pagoService.remove(req.params.id);
+      const authContext = getAuthContext(req);
+      await pagoService.remove(req.params.id, authContext);
       res.redirect(req.baseUrl);
     } catch (error) {
       next(error);

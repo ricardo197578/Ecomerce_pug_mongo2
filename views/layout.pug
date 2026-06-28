@@ -7,17 +7,33 @@ html(lang="es")
     style.
       body { font-family: "Segoe UI", sans-serif; margin: 24px; }
       nav a { margin-right: 12px; }
+      nav form { display: inline; margin-left: 12px; }
       table { border-collapse: collapse; width: 100%; margin-top: 12px; }
       th, td { border: 1px solid #ddd; padding: 8px; }
       .error { color: #b00020; }
   body
     nav
       a(href="/") Inicio
-      a(href="/comercios") Comercios
-      a(href="/tiendas") Tiendas
-      a(href="/usuarios") Usuarios
-      a(href="/transacciones") Transacciones
-      a(href="/pagos") Pagos
-      a(href="/logisticas") Logisticas
-      a(href="/suscripciones") Suscripciones
+      if isAuthenticated
+        a(href="/tiendas") Tiendas
+        a(href="/usuarios") Usuarios
+        a(href="/transacciones") Transacciones
+        a(href="/pagos") Pagos
+        a(href="/logisticas") Logisticas
+        a(href="/reportes/conciliacion") Conciliacion
+        a(href="/reportes/hot-sale") Hot Sale
+      if isPlatformAdmin
+        a(href="/comercios") Comercios
+        a(href="/cuentas-comercio") Cuentas comercio
+        a(href="/suscripciones") Suscripciones
+        a(href="/reportes/facturacion") Facturacion
+      if !isAuthenticated
+        a(href="/login") Login comercio
+        a(href="/platform/login") Login plataforma
+      else if isPlatformAdmin
+        form(method="post" action="/platform/logout")
+          button(type="submit") Cerrar sesion plataforma
+      else
+        form(method="post" action="/logout")
+          button(type="submit") Cerrar sesion
     block content

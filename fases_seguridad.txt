@@ -1,0 +1,176 @@
+Sí. Te propongo este plan por fases, pensado para tocar lo mínimo al principio y reducir riesgo.
+Enfoque
+- Mantener la arquitectura actual: routes -> controllers -> services -> repositories -> models.
+- Separar autenticación de la entidad operativa Usuario.
+- Implementar primero plataforma, después clientes/comercios, y recién luego el aislamiento multi-tenant completo.
+Decisión recomendada
+- Crear una nueva entidad de acceso, por ejemplo Account o AuthUser, en vez de reutilizar models/Usuario.js.
+- Motivo: Usuario hoy representa usuarios operativos del negocio y no cuentas de login; mezclarlo con passwords y sesiones complica CRUDs, vistas y reglas actuales.
+
+Fase 1: Base de autenticación
+- Agregar dependencias: bcrypt para hash de passwords.
+- Crear modelo nuevo models/Account.js con campos mínimos:
+  - email
+  - passwordHash
+  - role
+  - comercioId opcional para cuentas cliente
+  - activo
+  - lastLoginAt opcional
+- Crear repositories/account.repository.js con findByEmail, findById, create.
+- Crear services/auth.service.js para:
+  - validar credenciales
+  - comparar password con bcrypt
+  - devolver identidad segura para sesión
+- Mover secretos a .env:
+  - SESSION_SECRET
+  - MONGODB_URI
+  - PORT
+  - opcional NODE_ENV
+- Actualizar config/config.js para exponer esas variables.
+
+Fase 2: Sesión segura
+- Reemplazar la sesión actual de app.js por configuración segura:
+  - secret desde .env
+  - httpOnly: true
+  - sameSite: "lax"
+  - secure: false en dev, true en prod
+- Guardar en sesión algo como:
+  - accountId
+  - role
+  - comercioId si aplica
+- Agregar middleware global que exponga en res.locals:
+  - isAuthenticated
+  - currentUser
+  - currentRole
+  - currentComercioId
+Fase 3: Middlewares de auth/autorización
+- Crear middlewares/requireAuth.js.
+- Crear middlewares/requireRole.js.
+- Crear middlewares/requireTenantAccess.js.
+- Regla recomendada:
+  - PLATFORM_ADMIN ve todo.
+  - COMMERCE_ADMIN y COMMERCE_USER solo ven recursos de su comercioId.
+- requireTenantAccess debería validar contra el recurso real, no solo contra params, para evitar bypass por URL manual.
+Fase 4: Login/logout de plataforma
+- Reemplazar controllers/platformAuth.controller.js hardcodeado por login real contra Account.
+- Mantener rutas existentes:
+  - GET /platform/login
+  - POST /platform/login
+  - POST /platform/logout
+- Proteger con requireRole(["PLATFORM_ADMIN"]):
+  - /suscripciones
+  - /reportes/facturacion
+  - futuras rutas globales de administración
+- Mensaje de error único:
+  - “Credenciales inválidas”
+  - sin revelar si falló email o password.
+Fase 5: Login/logout de cliente/comercio
+- Crear nuevo controller, por ejemplo controllers/auth.controller.js.
+- Crear rutas:
+  - GET /login
+  - POST /login
+  - POST /logout
+- Permitir login a:
+  - COMMERCE_ADMIN
+  - COMMERCE_USER
+- Decidir landing post-login:
+  - recomendado: dashboard o /
+- Desde ahí proteger panel operativo con requireAuth.
+Fase 6: Seed de administrador inicial
+- Crear script de seed, por ejemplo scripts/seed-platform-admin.js.
+- Leer credenciales iniciales desde variables de entorno:
+  - SEED_PLATFORM_ADMIN_EMAIL
+  - SEED_PLATFORM_ADMIN_PASSWORD
+- Hashear con bcrypt.
+- Crear cuenta con rol PLATFORM_ADMIN.
+- Documentar comando en README.md.
+Fase 7: Multi-tenant en servicios y repositorios
+- Cambiar lecturas y escrituras para recibir contexto de actor:
+  - role
+  - comercioId
+- Recomendación técnica:
+  - Los controllers pasan authContext al service.
+  - Los services deciden filtros por tenant.
+- Ejemplos:
+  - usuarioService.getAll(authContext)
+  - transaccionService.getById(id, authContext)
+  - pagoService.update(id, payload, authContext)
+- Si el actor es cliente/comercio:
+  - filtrar siempre por comercioId
+- Si el actor es PLATFORM_ADMIN:
+  - acceso global
+Fase 8: Protección de entidades operativas
+- Aplicar aislamiento en este orden:
+  1. tiendas
+  2. usuarios
+  3. transacciones
+  4. pagos
+  5. logisticas
+  6. reportes
+- Porque todas dependen de comercioId directa o indirectamente.
+- En entidades indirectas, validar relación completa:
+  - tienda pertenece al comercio
+  - usuario pertenece a la tienda/comercio
+  - transacción pertenece al comercio correcto
+  - pago/logística cuelgan de transacción válida
+Fase 9: Ajustes de controllers y vistas
+- En formularios de cliente/comercio:
+  - no permitir elegir otro comercioId si ya viene de sesión
+  - idealmente ocultarlo o fijarlo en backend
+- En listados:
+  - mostrar solo datos del tenant autenticado
+- En vistas de plataforma:
+  - mantener acceso global solo para admin
+- Evitar mostrar credenciales o datos sensibles.
+Fase 10: Reportes y rutas especiales
+- /reportes/facturacion: solo PLATFORM_ADMIN.
+- /reportes/conciliacion y /reportes/hot-sale:
+  - definir si serán globales o por comercio
+  - mi recomendación:
+    - cliente/comercio: ver solo sus datos
+    - plataforma: ver global o filtrable
+- APIs JSON de reportes: misma política que vistas HTML.
+Fase 11: Testing
+- Agregar tests de servicio y middleware, no solo de controlador.
+- Casos mínimos:
+  - login válido e inválido
+  - password hasheado
+  - acceso denegado por rol
+  - usuario de comercio A no accede a datos de comercio B
+  - PLATFORM_ADMIN sí accede
+  - logout destruye sesión
+- Usar node --test.
+Fase 12: Documentación
+- Actualizar README.md con:
+  - variables de entorno
+  - seed inicial
+  - login cliente
+  - login plataforma
+  - seguridad básica de sesión
+  - ejemplos de pruebas manuales
+- Agregar .env.example.
+Orden real de implementación
+1. Modelo Account + repo + service auth  
+2. .env + sesión segura  
+3. Login/logout plataforma  
+4. Seed admin  
+5. Login/logout cliente  
+6. Middlewares requireAuth, requireRole  
+7. Tenant filtering en services críticos  
+8. Ajuste de controllers/vistas  
+9. Tests  
+10. README
+Riesgos a vigilar
+- No mezclar _id de Mongo con id custom sin criterio.
+- No confiar en req.body.comercioId cuando el usuario ya está autenticado.
+- No filtrar solo en la UI; el filtro debe vivir en service/repository.
+- No romper los CRUDs actuales de plataforma al introducir restricciones.
+Mi default técnico
+- Account separado de Usuario
+- auth con express-session sin JWT
+- tenant filtering desde services
+- mantener /platform/login y agregar /login
+- rol plataforma único inicial: PLATFORM_ADMIN
+Si querés, el próximo paso te lo doy como “mapa archivo por archivo”, indicando exactamente qué crear y qué modificar en cada ruta, controller, service, repository y model.
+
+

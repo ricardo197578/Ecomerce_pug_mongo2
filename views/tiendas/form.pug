@@ -5,11 +5,15 @@ block content
   if errorMessage
     p.error= errorMessage
   form(method="post" action=`/tiendas${formAction || ""}`)
-    label(for="comercioId") Comercio
-    select(name="comercioId" id="comercioId" required)
-      option(value="") Seleccionar comercio
-      each comercio in comercios
-        option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
+    if canSelectComercio
+      label(for="comercioId") Comercio
+      select(name="comercioId" id="comercioId" required)
+        option(value="") Seleccionar comercio
+        each comercio in comercios
+          option(value=comercio._id selected=String(formData.comercioId || "") === String(comercio._id))= `${comercio.nombre} (${comercio.cuit})`
+    else
+      p Comercio: #{selectedComercio ? `${selectedComercio.nombre} (${selectedComercio.cuit})` : "Sin comercio"}
+      input(type="hidden" name="comercioId" value=formData.comercioId || (selectedComercio ? selectedComercio._id : ""))
     input(type="text" name="nombre" placeholder="Nombre" value=formData.nombre)
     input(type="text" name="descripcion" placeholder="Descripcion" value=formData.descripcion)
     label

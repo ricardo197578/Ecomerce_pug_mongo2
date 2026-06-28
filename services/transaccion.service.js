@@ -2,19 +2,23 @@ import { comercioRepository } from "../repositories/comercio.repository.js";
 import { tiendaRepository } from "../repositories/tienda.repository.js";
 import { transaccionRepository } from "../repositories/transaccion.repository.js";
 import { usuarioRepository } from "../repositories/usuario.repository.js";
+import { buildScopeFilter, ensureTenantAccess, resolveScopedComercioId, resolveScopedTiendaId } from "../utils/authContext.js";
 import { HttpError } from "../utils/httpError.js";
 
 export const transaccionService = {
-  getAll() {
-    return transaccionRepository.findAll();
+  getAll(authContext = null) {
+    return transaccionRepository.findAll(buildScopeFilter(authContext));
   },
-  async getById(id) {
+  async getById(id, authContext = null) {
     const item = await transaccionRepository.findById(id);
     if (!item) throw new HttpError(404, "NOT_FOUND", "Transaccion no encontrada.");
+    ensureTenantAccess(item, authContext, "Transaccion");
     return item;
   },
-  async create(payload) {
+  async create(payload, authContext = null) {
     const normalized = normalizePayload(payload);
+    normalized.comercioId = resolveScopedComercioId(authContext, normalized.comercioId);
+    normalized.tiendaId = resolveScopedTiendaId(authContext, normalized.tiendaId);
     validatePayload(normalized);
     const { comercioId, tiendaId, usuarioId } = normalized;
     const [comercio, tienda, usuario] = await Promise.all([
@@ -25,12 +29,18 @@ export const transaccionService = {
     if (!comercio || !tienda || !usuario) {
       throw new HttpError(404, "NOT_FOUND", "Relacion de transaccion invalida.");
     }
+    if (tienda.comercioId !== comercioId || usuario.comercioId !== comercioId) {
+      throw new HttpError(422, "RELATIONSHIP_ERROR", "La tienda o el usuario no pertenecen al comercio.");
+    }
     return transaccionRepository.create(normalized);
   },
-  async update(id, payload) {
+  async update(id, payload, authContext = null) {
     const current = await transaccionRepository.findById(id);
     if (!current) throw new HttpError(404, "NOT_FOUND", "Transaccion no encontrada.");
+    ensureTenantAccess(current, authContext, "Transaccion");
     const normalized = normalizePayload({ ...current, ...payload, estado: current.estado, pagoId: current.pagoId, logisticaId: current.logisticaId });
+    normalized.comercioId = resolveScopedComercioId(authContext, normalized.comercioId);
+    normalized.tiendaId = resolveScopedTiendaId(authContext, normalized.tiendaId);
     validatePayload(normalized);
     const [comercio, tienda, usuario] = await Promise.all([
       comercioRepository.findById(normalized.comercioId),
@@ -39,6 +49,9 @@ export const transaccionService = {
     ]);
     if (!comercio || !tienda || !usuario) {
       throw new HttpError(404, "NOT_FOUND", "Relacion de transaccion invalida.");
+    }
+    if (tienda.comercioId !== normalized.comercioId || usuario.comercioId !== normalized.comercioId) {
+      throw new HttpError(422, "RELATIONSHIP_ERROR", "La tienda o el usuario no pertenecen al comercio.");
     }
     return transaccionRepository.update(id, {
       comercioId: normalized.comercioId,
@@ -49,7 +62,11 @@ export const transaccionService = {
       descripcion: normalized.descripcion
     });
   },
-  async remove(id) {
+  async remove(id, authContext = null) {
+    const current = await transaccionRepository.findById(id);
+    if (!current) throw new HttpError(404, "NOT_FOUND", "Transaccion no encontrada.");
+    ensureTenantAccess(current, authContext, "Transaccion");
+
     const deleted = await transaccionRepository.remove(id);
     if (!deleted) throw new HttpError(404, "NOT_FOUND", "Transaccion no encontrada.");
   }

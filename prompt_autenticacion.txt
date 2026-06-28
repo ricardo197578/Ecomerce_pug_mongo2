@@ -1,0 +1,91 @@
+Tengo un proyecto backend web de e-commerce/SaaS hecho con Node.js, Express, Pug y MongoDB.
+
+Contexto:
+- Arquitectura por capas:
+  routes -> controllers -> services -> repositories -> models
+- Administra:
+  comercios, tiendas, usuarios, transacciones, pagos, logística, suscripciones y reportes.
+- Actualmente tiene autenticación básica:
+  - Login de plataforma en /platform/login
+  - Usa express-session
+  - Algunas rutas protegidas: suscripciones y reportes/facturación
+  - Credenciales hardcodeadas:
+    usuario: admin
+    password: codenova123
+
+Necesito mejorar la seguridad y separar claramente dos accesos:
+
+1) Panel operativo del cliente/comercio
+- Debe requerir login.
+- Cada comercio o persona que contrata el servicio SaaS debe acceder solo a sus propios datos.
+- Debe poder ver/gestionar su operación: tiendas, usuarios, transacciones, pagos, logística y reportes propios.
+- No debe poder ver datos de otros comercios.
+- Implementar control multi-tenant usando comercioId / tenantId en usuarios, consultas y rutas.
+
+2) Panel administrador de la plataforma
+- Acceso exclusivo para el creador/administrador de CodeNova.
+- Desde este panel se deben administrar:
+  - comercios registrados
+  - suscripciones
+  - pagos recibidos por el servicio SaaS
+  - facturación
+  - reportes globales
+- Debe estar protegido con rol SUPER_ADMIN o PLATFORM_ADMIN.
+- Ningún usuario cliente debe acceder a estas rutas.
+
+Tareas técnicas:
+- Eliminar credenciales hardcodeadas.
+- Crear modelo de usuario seguro en MongoDB.
+- Guardar contraseñas hasheadas con bcrypt.
+- Implementar roles:
+  - PLATFORM_ADMIN
+  - COMMERCE_ADMIN
+  - COMMERCE_USER
+- Implementar middleware:
+  - requireAuth
+  - requireRole
+  - requireTenantAccess
+- Proteger rutas según rol.
+- Crear login separado o diferenciado:
+  - /login para clientes/comercios
+  - /platform/login para administrador de plataforma
+- Configurar express-session de forma segura:
+  - secret desde .env
+  - httpOnly: true
+  - sameSite: lax
+  - secure: false en desarrollo y true en producción
+- Crear logout.
+- Validar entradas del login.
+- Agregar mensajes de error seguros, sin revelar si falló usuario o contraseña.
+- Crear usuario administrador inicial mediante seed, no hardcodeado en la vista.
+- Crear archivo .env.example con las variables necesarias.
+- Revisar controllers, services y repositories para que las consultas filtren por tenantId cuando corresponda.
+- Evitar que un comercio pueda consultar, modificar o borrar datos de otro comercio.
+- Mantener la arquitectura actual del proyecto.
+- No romper las rutas existentes: adaptar lo mínimo necesario.
+
+Entregables esperados:
+1. Archivos modificados y nuevos.
+2. Código completo de:
+   - modelo User
+   - middleware de autenticación/autorización
+   - rutas de login/logout
+   - seed de administrador inicial
+   - ejemplo de protección de rutas de cliente
+   - ejemplo de protección de rutas de plataforma
+3. Explicación breve de cómo probar:
+   - login de cliente
+   - login de plataforma
+   - acceso denegado por rol
+   - aislamiento de datos por comercio
+4. Actualizar el README con:
+   - configuración de .env
+   - cómo crear el admin inicial
+   - cómo iniciar el proyecto
+   - credenciales solo de ejemplo para desarrollo
+
+Importante:
+- No mostrar usuarios ni contraseñas reales en las vistas.
+- No dejar passwords en texto plano.
+- No dejar credenciales hardcodeadas.
+- Priorizar seguridad, claridad y compatibilidad con Express + Pug + MongoDB.
