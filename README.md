@@ -154,7 +154,7 @@ Archivos clave:
 ### Reglas de acceso
 
 - `PLATFORM_ADMIN` puede administrar la plataforma completa.
-- `COMMERCE_ADMIN` puede operar todo dentro de su propio `comercioId`.
+- `COMMERCE_ADMIN` puede operar todo dentro de su propio `comercioId` y gestionar cuentas `COMMERCE_USER` de su comercio.
 - `COMMERCE_USER` queda limitado a su `comercioId` y a una `tiendaId` especifica.
 - Un usuario de comercio no debe ver ni acceder a gestion global de CodeNova.
 - Los reportes operativos del comercio se filtran por tenant.
@@ -162,18 +162,19 @@ Archivos clave:
 ### Matriz resumida de permisos
 
 - `PLATFORM_ADMIN`: ve, crea, edita y elimina todo.
-- `COMMERCE_ADMIN`: ve y administra tiendas, usuarios, transacciones, pagos y logistica de todo su comercio.
-- `COMMERCE_USER`: no administra tiendas; solo opera usuarios, transacciones, pagos, logistica y reportes dentro de su tienda asignada.
+- `COMMERCE_ADMIN`: ve y administra tiendas, cuentas `COMMERCE_USER`, usuarios, transacciones, pagos y logistica de todo su comercio.
+- `COMMERCE_USER`: no administra tiendas ni cuentas; solo opera usuarios, transacciones, pagos, logistica y reportes dentro de su tienda asignada.
 
 ## Estado actual logrado
 
 Los cambios de seguridad y operacion incorporados hasta ahora dejan el sistema asi:
 
 - Existe un admin inicial de plataforma creado por seed.
-- El alta de nuevos accesos de comercio se hace desde `/cuentas-comercio` con un `PLATFORM_ADMIN`.
+- El alta de nuevos accesos de comercio se hace desde `/cuentas-comercio` con `PLATFORM_ADMIN`.
+- Un `COMMERCE_ADMIN` tambien puede crear, editar y eliminar cuentas `COMMERCE_USER` de su propio comercio.
 - El panel de comercio queda aislado por `comercioId`.
 - Las cuentas `COMMERCE_USER` quedan ademas aisladas por `tiendaId`.
-- Los usuarios de comercio no ven la seccion de gestion de plataforma en el inicio.
+- Los usuarios de comercio no ven la seccion de gestion de plataforma en el inicio, y un `COMMERCE_USER` tampoco ve opciones de tiendas o cuentas que no puede administrar.
 - El CRUD generico ya propaga `authContext`, evitando errores como el `401 AUTH_REQUIRED` al ver/editar comercios siendo admin de plataforma.
 
 En resumen, ya se alcanzo una separacion clara entre:
@@ -360,8 +361,8 @@ http://localhost:3002
 1. Entrar a `/comercios`
 2. Crear un comercio nuevo
 3. Entrar a `/cuentas-comercio`
-4. Crear una cuenta asociada a ese comercio
-5. Si el rol es `COMMERCE_USER`, asignarle tambien una tienda
+4. Crear una cuenta `COMMERCE_ADMIN` asociada a ese comercio
+5. Ingresar luego con esa cuenta para crear tiendas y, si hace falta, cuentas `COMMERCE_USER` asociadas a una tienda
 
 ### Paso 10. Probar el acceso del comercio
 
@@ -373,9 +374,11 @@ http://localhost:3002
 
 - `COMMERCE_ADMIN`
   - debe ver y administrar todo su comercio
+  - debe poder crear, editar y eliminar cuentas `COMMERCE_USER` de su propio comercio
 - `COMMERCE_USER`
   - debe quedar limitado a su tienda
   - no debe poder crear nuevas tiendas
+  - no debe poder ver ni administrar cuentas de comercio
 - `PLATFORM_ADMIN`
   - debe conservar acceso total global
 
@@ -428,10 +431,12 @@ npm start
 
 1. Iniciar sesion como `PLATFORM_ADMIN`.
 2. Crear el comercio en `/comercios`.
-3. Crear la cuenta de acceso en `/cuentas-comercio`.
-4. Si la cuenta es `COMMERCE_USER`, asignarle una tienda concreta.
-5. Entregar email y password al cliente.
-6. El cliente entra por `/login`.
+3. Crear la cuenta `COMMERCE_ADMIN` de acceso en `/cuentas-comercio`.
+4. Ingresar con esa cuenta de comercio.
+5. Crear una o mas tiendas del comercio.
+6. Crear las cuentas `COMMERCE_USER` desde `/cuentas-comercio` del panel del comercio y asociarlas a una tienda concreta.
+7. Entregar email y password al cliente.
+8. El cliente entra por `/login`.
 
 Este es ahora el flujo normal recomendado.
 
@@ -471,8 +476,8 @@ Esta seccion resume un recorrido sugerido para mostrar la plataforma.
 
 1. Entrar a `/cuentas-comercio`.
 2. Crear una cuenta asociada al comercio recien dado de alta.
-3. Elegir rol `COMMERCE_ADMIN` o `COMMERCE_USER`.
-4. Si el rol es `COMMERCE_USER`, seleccionar la tienda asociada.
+3. Crear primero una cuenta `COMMERCE_ADMIN`.
+4. Si luego se necesitan operadores por tienda, ingresar con ese `COMMERCE_ADMIN`, crear la tienda y despues crear la cuenta `COMMERCE_USER` asociada.
 5. Definir email y password.
 
 ### Paso 6. Probar el login del comercio
@@ -482,12 +487,14 @@ Esta seccion resume un recorrido sugerido para mostrar la plataforma.
 3. Ingresar con la cuenta creada en `/cuentas-comercio`.
 4. Verificar que el usuario del comercio pueda acceder a:
    - `/tiendas`
+   - `/cuentas-comercio`
    - `/usuarios`
    - `/transacciones`
    - `/pagos`
    - `/logisticas`
    - `/reportes/conciliacion`
    - `/reportes/hot-sale`
+5. Si se ingresa con `COMMERCE_USER`, verificar que no aparezcan las opciones visuales para administrar tiendas o cuentas.
 
 ### Paso 7. Mostrar el aislamiento multi-tenant
 
@@ -500,7 +507,7 @@ Esta seccion resume un recorrido sugerido para mostrar la plataforma.
 
 1. Con una cuenta de comercio, verificar que no aparezca la gestion de plataforma en el inicio.
 2. Intentar entrar a `/comercios`, `/cuentas-comercio` o `/suscripciones`.
-3. Verificar que el acceso este restringido.
+3. Verificar que el acceso este restringido para `COMMERCE_USER` y que `COMMERCE_ADMIN` solo pueda usar `/cuentas-comercio` dentro de su propio comercio.
 
 ## Rutas principales
 
@@ -658,10 +665,12 @@ Para una entrega academica, estos tests muestran que la seguridad no quedo solo 
 
 1. Iniciar sesion como `PLATFORM_ADMIN`.
 2. Crear un comercio en `/comercios`.
-3. Crear su acceso en `/cuentas-comercio`.
+3. Crear su acceso `COMMERCE_ADMIN` en `/cuentas-comercio`.
 4. Cerrar sesion de plataforma.
 5. Entrar por `/login` con esa cuenta.
-6. Verificar acceso a `tiendas`, `usuarios`, `transacciones`, `pagos`, `logisticas` y reportes operativos.
+6. Verificar acceso a `tiendas`, `cuentas-comercio`, `usuarios`, `transacciones`, `pagos`, `logisticas` y reportes operativos.
+7. Crear una tienda y luego una cuenta `COMMERCE_USER` asociada a esa tienda.
+8. Ingresar con la cuenta `COMMERCE_USER` y verificar que no vea opciones para administrar tiendas ni cuentas.
 
 ### Aislamiento multi-tenant
 
@@ -681,6 +690,7 @@ Hoy CodeNova ya funciona como plataforma multi-comercio con:
 - passwords hasheadas con `bcrypt`
 - separacion entre admin de plataforma y usuarios de comercio
 - alta de accesos de comercio desde la propia UI administrativa
+- alta y gestion de cuentas `COMMERCE_USER` desde el panel del `COMMERCE_ADMIN`
 - proteccion por roles
 - aislamiento por tenant
 - aislamiento adicional por tienda para `COMMERCE_USER`

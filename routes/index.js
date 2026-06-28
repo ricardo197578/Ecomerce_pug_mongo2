@@ -49,7 +49,9 @@ router.get("/platform/login", platformAuthController.showLogin);
 router.post("/platform/login", platformAuthController.login);
 router.post("/platform/logout", platformAuthController.logout);
 router.use("/comercios", requirePlatformAuth, buildCrudRoutes(comercioController));
-router.use("/cuentas-comercio", requirePlatformAuth, buildCrudRoutes(accountController));
+router.use("/cuentas-comercio", buildCrudRoutes(accountController, {
+  all: requireCommerceAdmin
+}));
 router.use("/tiendas", requireOperationalAuth, buildCrudRoutes(tiendaController, {
   showCreate: requireCommerceAdmin,
   create: requireCommerceAdmin,

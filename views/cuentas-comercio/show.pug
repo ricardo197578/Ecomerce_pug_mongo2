@@ -2,29 +2,29 @@ extends ../layout
 
 block content
   h1 Detalle de cuenta de comercio
-  p
-    strong Email:
-    |  #{item.email}
-  p
-    strong Rol:
-    |  #{item.role}
-  p
-    strong Comercio:
-    |  #{item.comercioNombre}
-  p
-    strong CUIT:
-    |  #{item.comercioCuit}
-  p
-    strong Tienda:
-    |  #{item.tiendaNombre || "-"}
-  p
-    strong Activa:
-    |  #{item.activo ? "Si" : "No"}
-  p
-    strong Ultimo login:
-    |  #{item.lastLoginAt || "-"}
-
-  p
-    a(href=`/cuentas-comercio/${item._id}/edit`) Editar
-    |  
-    a(href="/cuentas-comercio") Volver al listado
+  .card
+    ul.detail-list
+      li
+        span.detail-label Email
+        span= item.email
+      li
+        span.detail-label Rol
+        span= item.role
+      li
+        span.detail-label Comercio
+        span= item.comercioNombre
+      li
+        span.detail-label CUIT
+        span= item.comercioCuit
+      li
+        span.detail-label Tienda
+        span= item.tiendaNombre || "-"
+      li
+        span.detail-label Activa
+        span= item.activo ? "Si" : "No"
+      li
+        span.detail-label Ultimo login
+        span= item.lastLoginAt || "-"
+    .actions
+      a.btn.btn-secondary(href=`/cuentas-comercio/${item._id}/edit`) Editar
+      a.btn.btn-secondary(href="/cuentas-comercio") Volver al listado

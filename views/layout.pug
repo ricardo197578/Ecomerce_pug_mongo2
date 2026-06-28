@@ -65,6 +65,20 @@ html(lang="es")
         transition: background .15s, color .15s;
       }
       nav a:hover { background: rgba(255,255,255,.15); color: #fff; }
+      nav form { display: inline-flex; margin-left: auto; }
+      nav .nav-spacer { flex: 1; }
+      nav .nav-button {
+        background: transparent;
+        color: rgba(255,255,255,.85);
+        padding: 14px 12px;
+        font-size: .875rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background .15s, color .15s;
+      }
+      nav .nav-button:hover { background: rgba(255,255,255,.15); color: #fff; }
       /* MAIN */
       main {
         flex: 1;
@@ -216,13 +230,30 @@ html(lang="es")
     nav
       a.nav-brand(href="/") ⚡ CodeNova
       a(href="/") Inicio
-      a(href="/comercios") Comercios
-      a(href="/tiendas") Tiendas
-      a(href="/usuarios") Usuarios
-      a(href="/transacciones") Transacciones
-      a(href="/pagos") Pagos
-      a(href="/logisticas") Logísticas
-      a(href="/suscripciones") Suscripciones
+      if isPlatformAdmin
+        a(href="/comercios") Comercios
+        a(href="/cuentas-comercio") Cuentas comercio
+      if isPlatformAdmin || isCommerceAdmin
+        a(href="/tiendas") Tiendas
+      if isCommerceAdmin
+        a(href="/cuentas-comercio") Cuentas comercio
+      if isAuthenticated
+        a(href="/usuarios") Usuarios
+        a(href="/transacciones") Transacciones
+        a(href="/pagos") Pagos
+        a(href="/logisticas") Logísticas
+      if isPlatformAdmin
+        a(href="/suscripciones") Suscripciones
+      span.nav-spacer
+      if !isAuthenticated
+        a(href="/login") Login comercio
+        a(href="/platform/login") Login plataforma
+      else if isPlatformAdmin
+        form(method="post" action="/platform/logout")
+          button.nav-button(type="submit") Cerrar sesión plataforma
+      else
+        form(method="post" action="/logout")
+          button.nav-button(type="submit") Cerrar sesión
     main
       block content
     footer

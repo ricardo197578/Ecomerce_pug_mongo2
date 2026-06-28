@@ -118,3 +118,139 @@ test("accountService.update permite cambiar email sin cambiar contrasena", async
   assert.equal(updated.role, "COMMERCE_USER");
   assert.equal(updated.tiendaId, "tienda-1");
 });
+
+test("accountService.create permite a COMMERCE_ADMIN crear solo COMMERCE_USER de su comercio", async (t) => {
+  const originalFindByIdComercio = comercioRepository.findById;
+  const originalFindByIdTienda = tiendaRepository.findById;
+  const originalHashPassword = authService.hashPassword;
+  const originalCreate = accountRepository.create;
+
+  t.after(() => {
+    comercioRepository.findById = originalFindByIdComercio;
+    tiendaRepository.findById = originalFindByIdTienda;
+    authService.hashPassword = originalHashPassword;
+    accountRepository.create = originalCreate;
+  });
+
+  comercioRepository.findById = async (id) => ({ _id: id, nombre: "Centro Hogar" });
+  tiendaRepository.findById = async (id) => ({ _id: id, comercioId: "com-1", nombre: "Sucursal Centro" });
+  authService.hashPassword = async (password) => `hash:${password}`;
+  accountRepository.create = async (data) => ({ _id: "acc-2", id: "pub-2", ...data });
+
+  const created = await accountService.create({
+    email: "user@demo.local",
+    password: "Password2026",
+    role: "COMMERCE_ADMIN",
+    comercioId: "otro-comercio",
+    tiendaId: "tienda-1",
+    activo: true
+  }, {
+    role: "COMMERCE_ADMIN",
+    comercioId: "com-1",
+    isCommerceAdmin: true,
+    isPlatformAdmin: false,
+    isCommerceUser: false
+  });
+
+  assert.equal(created.role, "COMMERCE_USER");
+  assert.equal(created.comercioId, "com-1");
+  assert.equal(created.tiendaId, "tienda-1");
+});
+
+test("accountService.create impide a COMMERCE_ADMIN crear cuentas fuera de su tienda-comercio", async (t) => {
+  const originalFindByIdComercio = comercioRepository.findById;
+  const originalFindByIdTienda = tiendaRepository.findById;
+
+  t.after(() => {
+    comercioRepository.findById = originalFindByIdComercio;
+    tiendaRepository.findById = originalFindByIdTienda;
+  });
+
+  comercioRepository.findById = async (id) => ({ _id: id, nombre: "Centro Hogar" });
+  tiendaRepository.findById = async (id) => ({ _id: id, comercioId: "com-2", nombre: "Sucursal Norte" });
+
+  await assert.rejects(
+    () => accountService.create({
+      email: "user@demo.local",
+      password: "Password2026",
+      role: "COMMERCE_USER",
+      comercioId: "com-1",
+      tiendaId: "tienda-2",
+      activo: true
+    }, {
+      role: "COMMERCE_ADMIN",
+      comercioId: "com-1",
+      isCommerceAdmin: true,
+      isPlatformAdmin: false,
+      isCommerceUser: false
+    }),
+    (error) => error.statusCode === 422
+  );
+});
+
+test("accountService.getAll limita a COMMERCE_ADMIN a usuarios de su comercio", async (t) => {
+  const originalFindAll = accountRepository.findAll;
+
+  t.after(() => {
+    accountRepository.findAll = originalFindAll;
+  });
+
+  accountRepository.findAll = async (filter) => {
+    assert.deepEqual(filter, {
+      role: "COMMERCE_USER",
+      comercioId: "com-1"
+    });
+
+    return [{
+      _id: "acc-3",
+      id: "pub-3",
+      email: "user@demo.local",
+      role: "COMMERCE_USER",
+      comercioId: "com-1",
+      tiendaId: "tienda-1",
+      activo: true,
+      lastLoginAt: null
+    }];
+  };
+
+  const items = await accountService.getAll({
+    role: "COMMERCE_ADMIN",
+    comercioId: "com-1",
+    isCommerceAdmin: true,
+    isPlatformAdmin: false,
+    isCommerceUser: false
+  });
+
+  assert.equal(items.length, 1);
+  assert.equal(items[0].role, "COMMERCE_USER");
+});
+
+test("accountService.getById bloquea a COMMERCE_ADMIN ver cuentas admin del mismo comercio", async (t) => {
+  const originalFindById = accountRepository.findById;
+
+  t.after(() => {
+    accountRepository.findById = originalFindById;
+  });
+
+  accountRepository.findById = async () => ({
+    _id: "acc-4",
+    id: "pub-4",
+    email: "admin@demo.local",
+    role: "COMMERCE_ADMIN",
+    comercioId: "com-1",
+    tiendaId: null,
+    activo: true,
+    lastLoginAt: null
+  });
+
+  await assert.rejects(
+    () => accountService.getById("acc-4", {
+      role: "COMMERCE_ADMIN",
+      comercioId: "com-1",
+      isCommerceAdmin: true,
+      isPlatformAdmin: false,
+      isCommerceUser: false
+    }),
+    (error) => error.statusCode === 404
+  );
+});
